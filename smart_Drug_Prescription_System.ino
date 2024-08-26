@@ -12,7 +12,7 @@ void beginTheSerialMonitor() {
 * informations like age, weight, height, and date will be there 
 * // hw-827 heart- rate sensor
 *
-*
+* #define BOT_TOKEN "6555915313:AAGtNf4aADfpbgbe8S3L-83bSeLerVB8LQE"
 * 
 * 
 */
