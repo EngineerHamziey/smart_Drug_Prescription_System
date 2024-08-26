@@ -1,19 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Drug Prescription System</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="/script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drug Prescription System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 2rem;
+    }
+
+    #questionContainer {
+      background: #fff;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 0.625rem rgba(0,0,0,0.1);
+      margin-bottom: 1.25rem;
+      min-width: 20rem;
+      max-width: 37.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.625rem;
+      font-size: 1.5rem;
+    }
+
+    .responseBtn {
+      padding: 0.625rem 1.25rem;
+      border: none;
+      border-radius: 0.25rem;
+      background-color: #007bff;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 0.3125rem;
+    }
+
+    .responseBtn:hover {
+      background-color: #0056b3;
+    }
+
+    #statusMessage {
+      margin-top: 1.25rem;
+      font-size: 1.5rem;
+    }
+
+    #responseContainer {
+      background: #fff;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 0.625rem rgba(0,0,0,0.1);
+      margin-top: 1.25rem;
+      width: 100%;
+      max-width: 37.5rem;
+    }
+
+    #responses {
+      background: #e9ecef;
+      padding: 0.625rem;
+      border-radius: 0.25rem;
+      min-height: 3.125rem;
+      border: 0.0625rem solid #ccc;
+    }
+  </style>
 </head>
 <body>
-    <h1>Smart Drug Prescription System</h1>
-    <div id="questionContainer">
-        <label for="question">Question will appear here...</label><br>
-        <button class="responseBtn" id="yesBtn">Yes</button>
-        <button class="responseBtn" id="noBtn">No</button>
+  <div id="questionContainer">
+    <h1>Drug Prescription System</h1>
+    <div id="question">
+      <!-- Question will be injected here -->
     </div>
-    <div id="statusMessage"></div>
+    <div id="buttons">
+      <button class="responseBtn" onclick="handleResponse('yes')">Yes</button>
+      <button class="responseBtn" onclick="handleResponse('no')">No</button>
+    </div>
+  </div>
+
+  <div id="responseContainer">
+    <h2>Response:</h2>
+    <div id="responses">
+      <!-- Responses will be injected here -->
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      "Are you able to sleep well?",
+      "Are you currently taking any medications prescribed by your doctor?",
+      "Are you currently pregnant?", 
+      "Do you have difficulty breathing?",
+      "Do you have a cough?",
+      "Do you have headache",
+      "Do you have a fever?",
+      "Are you experiencing fatigue?",
+      "Are you experiencing any pain or discomfort?",
+      "How would you rate your overall energy level?",
+      "Have you noticed any changes in your appetite?",
+      "Are you experiencing nausea or vomiting?"
+    ];
+    
+    let currentQuestionIndex = 0;
+
+    function showQuestion() {
+      const questionElement = document.getElementById('question');
+      questionElement.innerHTML = `<label>${questions[currentQuestionIndex]}</label>`;
+    }
+
+    function handleResponse(answer) {
+      const responsesElement = document.getElementById('responses');
+      responsesElement.innerHTML += `<p>${questions[currentQuestionIndex]} Answered: ${answer}</p>`;
+
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        document.getElementById('question').innerHTML = '<label>Thank you for answering the questions.</label>';
+        document.getElementById('buttons').style.display = 'none';
+      }
+    }
+
+    // Initialize the first question
+    showQuestion();
+  </script>
 </body>
 </html>
