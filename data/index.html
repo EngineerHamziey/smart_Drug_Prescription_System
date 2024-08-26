@@ -7,95 +7,76 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-color: #f4f4f4;
-      text-align: center;
-      padding: 2rem 1rem;
+      line-height: 1.4;
+    }
+
+    .heading {
+      margin: 2rem 0;
+    }
+
+    .container {
+      max-width: 50rem;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
-      color: #333;
-      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
     }
 
-    #questionContainer {
-      background: #fff;
-      padding: 1.25rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 0 0.625rem rgba(0,0,0,0.1);
-      margin-bottom: 1.25rem;
-      min-width: 20rem;
-      max-width: 37.5rem;
+    form div {
+      margin-bottom: 1rem;
     }
 
     label {
       display: block;
-      margin-bottom: 0.625rem;
-      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
     }
 
-    .responseBtn {
-      padding: 0.625rem 1.25rem;
+    input[type="radio"] {
+      margin-right: 0.5rem;
+    }
+
+    #prescriptionResult {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #e0f7fa;
+      border-radius: 0.5rem;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #00796b;
+      color: #fff;
       border: none;
       border-radius: 0.25rem;
-      background-color: #007bff;
-      color: #fff;
-      font-size: 1rem;
       cursor: pointer;
-      margin: 0.3125rem;
+      font-size: 1rem;
     }
 
-    .responseBtn:hover {
-      background-color: #0056b3;
+    button:hover {
+      background-color: #004d40;
     }
 
-    #statusMessage {
-      margin-top: 1.25rem;
-      font-size: 1.5rem;
-    }
-
-    #responseContainer {
-      background: #fff;
-      padding: 1.25rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 0 0.625rem rgba(0,0,0,0.1);
-      margin-top: 1.25rem;
-      width: 100%;
-      max-width: 37.5rem;
-    }
-
-    #responses {
-      background: #e9ecef;
-      padding: 0.625rem;
-      border-radius: 0.25rem;
-      min-height: 3.125rem;
-      border: 0.0625rem solid #ccc;
-    }
   </style>
 </head>
 <body>
-  <div id="questionContainer">
-    <h1>Drug Prescription System</h1>
-    <div id="question">
-      <!-- Question will be injected here -->
-    </div>
-    <div id="buttons">
-      <button class="responseBtn" onclick="handleResponse('yes')">Yes</button>
-      <button class="responseBtn" onclick="handleResponse('no')">No</button>
-    </div>
-  </div>
-
-  <div id="responseContainer">
-    <h2>Response:</h2>
-    <div id="responses">
-      <!-- Responses will be injected here -->
-    </div>
+  <div class="container">
+    <h1 class="heading">SMART DRUG PRESCRIPTION SYSTEM</h1>
+    <form id="healthForm">
+      <!-- Questions will be added dynamically here -->
+    </form>
+    <div id="prescriptionResult"></div>
+    <button onclick="submitForm()">Submit</button>
   </div>
 
   <script>
@@ -108,34 +89,89 @@
       "Do you have headache",
       "Do you have a fever?",
       "Are you experiencing fatigue?",
-      "Are you experiencing any pain or discomfort?",
+      "Are you experiencing any pain or discomfort in your abdominal?",
       "How would you rate your overall energy level?",
       "Have you noticed any changes in your appetite?",
       "Are you experiencing nausea or vomiting?"
     ];
-    
-    let currentQuestionIndex = 0;
 
-    function showQuestion() {
-      const questionElement = document.getElementById('question');
-      questionElement.innerHTML = `<label>${questions[currentQuestionIndex]}</label>`;
+    const questionContainer = document.getElementById('healthForm');
+
+    questions.forEach((question, index) => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <label>${question}</label><br>
+        <input type="radio" id="q${index}yes" name="q${index}" value="yes">
+        <label for="q${index}yes">Yes</label>
+        <input type="radio" id="q${index}no" name="q${index}" value="no">
+        <label for="q${index}no">No</label>
+        <br><br>
+      `;
+      questionContainer.appendChild(div);
+    });
+
+    function getFormData() {
+      const formData = {};
+      questions.forEach((_, index) => {
+        formData[`q${index}`] = document.querySelector(`input[name="q${index}"]:checked`)?.value || 'no';
+      });
+      return formData;
     }
 
-    function handleResponse(answer) {
-      const responsesElement = document.getElementById('responses');
-      responsesElement.innerHTML += `<p>${questions[currentQuestionIndex]} Answered: ${answer}</p>`;
+    function submitForm() {
+      const formData = getFormData();
+      const prescription = generatePrescription(formData);
+      document.getElementById('prescriptionResult').innerText = prescription;
+    }
 
-      currentQuestionIndex++;
-      if (currentQuestionIndex < questions.length) {
-        showQuestion();
-      } else {
-        document.getElementById('question').innerHTML = '<label>Thank you for answering the questions.</label>';
-        document.getElementById('buttons').style.display = 'none';
+    function generatePrescription(formData) {
+      let prescription = "Based on your responses, we recommend the following:";
+      
+      // Check for all possible combinations of answers
+      if (formData['q0'] === 'yes') {
+        prescription += "\n- You might want to consider sleep improvement strategies.";
       }
-    }
+      if (formData['q1'] === 'yes') {
+        prescription += "\n- Continue with your current medications.";
+      }
+      if (formData['q2'] === 'yes') {
+        prescription += "\n- Consult your doctor for any pregnancy-related medications.";
+      }
+      if (formData['q3'] === 'yes') {
+        prescription += "\n- Seek medical advice for difficulty in breathing.";
+      }
+      if (formData['q4'] === 'yes') {
+        prescription += "\n- Consult a healthcare professional for persistent cough.";
+      }
+      if (formData['q5'] === 'yes') {
+        prescription += "\n- You might need treatment for headache.";
+      }
+      if (formData['q6'] === 'yes') {
+        prescription += "\n- Consult a doctor for fever.";
+      }
+      if (formData['q7'] === 'yes') {
+        prescription += "\n- Discuss fatigue with a healthcare provider.";
+      }
+      if (formData['q8'] === 'yes') {
+        prescription += "\n- You may need an evaluation for abdominal pain or discomfort.";
+      }
+      if (formData['q9'] === 'yes') {
+        prescription += "\n- Consult a nutritionist or doctor for changes in appetite.";
+      }
+      if (formData['q10'] === 'yes') {
+        prescription += "\n- Seek medical attention for nausea or vomiting.";
+      }
+      if (formData['q11'] === 'yes') {
+        prescription += "\n- Consider a general health check-up based on your overall energy level.";
+      }
 
-    // Initialize the first question
-    showQuestion();
+      // Fallback message if no specific recommendations apply
+      if (prescription === "Based on your responses, we recommend the following:") {
+        prescription += "\nNo specific recommendations based on your responses.";
+      }
+  
+  return prescription;
+}
   </script>
 </body>
 </html>
