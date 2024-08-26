@@ -1,0 +1,69 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+  font-size: 2rem; /* Adjusted to rem */
+}
+
+#questionContainer {
+  background: #fff;
+  padding: 1.25rem; /* 20px */
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 0 0.625rem rgba(0,0,0,0.1); /* 10px */
+  margin-bottom: 1.25rem; /* 20px */
+}
+
+label {
+  display: block;
+  margin-bottom: 0.625rem; /* 10px */
+  font-size: 1.5rem; /* Adjusted to rem */
+}
+
+.responseBtn {
+  padding: 0.625rem 1.25rem; /* 10px 20px */
+  border: none;
+  border-radius: 0.25rem; /* 4px */
+  background-color: #007bff;
+  color: #fff;
+  font-size: 1rem; /* Adjusted to rem */
+  cursor: pointer;
+  margin: 0.3125rem; /* 5px */
+}
+
+.responseBtn:hover {
+  background-color: #0056b3;
+}
+
+#statusMessage {
+  margin-top: 1.25rem; /* 20px */
+  font-size: 1.5rem; /* Adjusted to rem */
+}
+
+#responseContainer {
+  background: #fff;
+  padding: 1.25rem; /* 20px */
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 0 0.625rem rgba(0,0,0,0.1); /* 10px */
+  margin-top: 1.25rem; /* 20px */
+  width: 100%;
+  max-width: 37.5rem; /* 600px */
+}
+
+#responses {
+  background: #e9ecef;
+  padding: 0.625rem; /* 10px */
+  border-radius: 0.25rem; /* 4px */
+  min-height: 3.125rem; /* 50px */
+  border: 0.0625rem solid #ccc; /* 1px */
+}
