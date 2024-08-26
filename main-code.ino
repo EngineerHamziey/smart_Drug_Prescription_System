@@ -22,23 +22,14 @@ const String questions[] = {
   "Have you noticed any changes in your appetite?",
   "Are you able to sleep well?",
   "Do you have difficulty breathing?",
-  
   "Are you experiencing nausea or vomiting?",
-  "Have you noticed any changes in your vision?",
-  "Are you experiencing dizziness or lightheadedness?",
-  "Are you experiencing any joint pain or stiffness?",
-  "Do you have any muscle pain or weakness?",
-  "Have you had any recent injuries or falls?",
-  "Are you experiencing any rashes or itching?",
-  "Are there any wounds or sores that are not healing properly?",
-  "Do you have any difficulty urinating?",
-  "Are you experiencing pain or burning during urination?",
-  "Are you currently taking any medications?",
-  "Do you have any known allergies to medications or substances?",
-  "Have you been in close contact with anyone who is ill?"
+  "Are you currently pregnant?"
+  
+  "Are you currently taking any medications prescribed by your doctor?"
 };
 
 // 
+const String pre
 
 
 

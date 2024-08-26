@@ -10,7 +10,7 @@ void beginTheSerialMonitor() {
 * System will prescribe drug and further deatails will be sent to user's telegram
 * we should have 10 prescription cases
 * informations like age, weight, height, and date will be there 
-*
+* // hw-827 heart- rate sensor
 *
 *
 * 

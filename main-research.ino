@@ -1,18 +1,30 @@
-#if 0
+#if 1
 
 #include <WiFi.h>
-#include <HTTPClient.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <UniversalTelegramBot.h>
+#include <WiFiClientSecure.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
-const char* ssid = "your_SSID";
-const char* password = "your_PASSWORD";
+// Wi-Fi credentials
+String wifiSSID = "project";
+String wifiPassword = "123456789";
+// Hamzatronics bot token: 1389612925
+// Telegram BOT Token
+#define BOT_TOKEN "6555915313:AAGtNf4aADfpbgbe8S3L-83bSeLerVB8LQE"
 
-// Initialize the LCD with I2C address 0x27 and 16 columns by 2 rows
-LiquidCrystal_I2C lcd(0x27, 20, 4);
+// Replace with your network credentials
+WiFiClientSecure securedClient;
+UniversalTelegramBot bot(BOT_TOKEN, securedClient);
 
+#define oneWireBus 5 // DS18B20 pin
+OneWire oneWire(oneWireBus);
+DallasTemperature sensors(&oneWire);
 
-const char* questions[] = {
+#define heartRateSensorPin 34 // Pin for heart rate sensor (can be any ADC pin on ESP32)
+
+const String questions[] = {
+  "Do you have a headache?",
   "Do you have a fever?",
   "Do you have a cough?",
   "Are you experiencing fatigue?",
@@ -21,102 +33,78 @@ const char* questions[] = {
   "Have you noticed any changes in your appetite?",
   "Are you able to sleep well?",
   "Do you have difficulty breathing?",
-  "Are you coughing up phlegm? If yes, what color is it?",
-  "Do you feel tightness or pain in your chest?",
   "Are you experiencing nausea or vomiting?",
-  "Have you had any changes in bowel movements?",
-  "Are you experiencing abdominal pain or discomfort?",
-  "Are you experiencing headaches? If yes, how severe are they?",
-  "Have you noticed any changes in your vision?",
-  "Are you experiencing dizziness or lightheadedness?",
-  "Are you experiencing any joint pain or stiffness?",
-  "Do you have any muscle pain or weakness?",
-  "Have you had any recent injuries or falls?",
-  "Are you experiencing any rashes or itching?",
-  "Have you noticed any changes in the appearance of your skin (e.g., color changes)?",
-  "Are there any wounds or sores that are not healing properly?",
-  "Do you have any difficulty urinating?",
-  "Are you experiencing pain or burning during urination?",
-  "Have you noticed any changes in the frequency or volume of urine?",
-  "Have you been feeling anxious or depressed?",
-  "Do you have trouble concentrating or making decisions?",
-  "Have there been any recent stressful events in your life?",
-  "Are you currently taking any medications? If yes, please list them.",
-  "Do you have any known allergies to medications or substances?",
-  "Have you traveled recently? If yes, where and when?",
-  "Have you been in close contact with anyone who is ill?",
-  "Do you work or live in an environment that may expose you to specific health risks?"
+  "Are you currently pregnant?",
+  "Are you currently taking any medications prescribed by your doctor?"
 };
 
-const int noOfQuestions = typeof(questions[]) / typeof(questions[0]);
-
-String answers[noOfQuestions];  // Store patient answers
+int questionIndex = 0;
+int answers[12];
 
 void setup() {
   Serial.begin(115200);
-  lcd.init();
-  lcd.backlight();
-  WiFi.begin(ssid, password);
-
+  
+  // Connect to Wi-Fi
+  WiFi.begin(wifiSSID.c_str(), wifiPassword.c_str());
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi...");
   }
-
   Serial.println("Connected to WiFi");
-  displayQuestion();
+
+  securedClient.setInsecure();
+  sensors.begin();
 }
 
 void loop() {
-  // Replace this with your actual input handling
-  // Simulating patient response with serial input
-  if (Serial.available()) {
-    char response = Serial.read();
-    if (response == 'y' || response == 'n') {
-      answers[questionIndex] = (response == 'y') ? "Yes" : "No";
-      questionIndex++;
-      if (questionIndex < 3) {
-        displayQuestion();
-      } else {
-        sendDataToServer();
-      }
+  int messageCount = bot.getUpdates(bot.last_message_received + 1);
+
+  for (int i = 0; i < messageCount; i++) {
+    String chatID = String(bot.messages[i].chat_id);
+    String text = bot.messages[i].text;
+
+    if (text == "/start") {
+      bot.sendMessage(chatID, "Welcome to the automatic drug prescription system.");
+      askNextQuestion(chatID);
+    } else if (text == "/yes" || text == "/no") {
+      handleAnswer(chatID, text);
     }
   }
-  delay(100);
 }
 
-void displayQuestion() {
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print(questions[questionIndex]);
-}
-
-void sendDataToServer() {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin("http://your_server.com/storePatientData");
-    http.addHeader("Content-Type", "application/json");
-
-    String payload = "{\"answers\": [";
-    for (int i = 0; i < 3; i++) {
-      payload += "\"" + answers[i] + "\"";
-      if (i < 2) payload += ", ";
-    }
-    payload += "]}";
-
-    int httpCode = http.POST(payload);
-
-    if (httpCode > 0) {
-      String response = http.getString();
-      Serial.println(response);
-      // Display prescription or next steps
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Prescription sent");
-    }
-
-    http.end();
+void askNextQuestion(String chatID) {
+  if (questionIndex < sizeof(questions) / sizeof(questions[0])) {
+    bot.sendMessage(chatID, questions[questionIndex]);
+    bot.sendMessage(chatID, "Reply with /yes or /no");
+  } else {
+    evaluateAnswers(chatID);
   }
+}
+
+void handleAnswer(String chatID, String answer) {
+  answers[questionIndex] = (answer == "/yes") ? 1 : 0;
+  questionIndex++;
+  askNextQuestion(chatID);
+}
+
+void evaluateAnswers(String chatID) {
+  // Placeholder for drug recommendation logic
+  bot.sendMessage(chatID, "Analyzing your responses...");
+
+  sensors.requestTemperatures();
+  float temperature = sensors.getTempCByIndex(0);
+
+  int heartRate = analogRead(heartRateSensorPin); // Basic analog read for heart rate
+
+  // Placeholder logic for temperature and heart rate analysis
+  if (temperature < 36.1 || temperature > 37.2 || heartRate < 60 || heartRate > 100) {
+    bot.sendMessage(chatID, "Your vital signs are abnormal. Please consult a doctor.");
+  } else {
+    bot.sendMessage(chatID, "Your vital signs are normal. Placeholder for drug recommendation.");
+  }
+
+  // Reset for next session
+  questionIndex = 0;
 }
 
 
