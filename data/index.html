@@ -112,11 +112,53 @@
       box-shadow: 0 0 0 2px #81d4fa; /* A light blue outline for accessibility */
     }
 
+    .temp-btn {
+      margin-bottom: 2rem;
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #0288d1; /* A nice blue color */
+      color: #fff;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .i-text {
+      color: red;
+    }
+
+    
+    .reading {
+      font-size: 1rem;
+      display: inline-block;
+      margin: 0.5rem;
+      text-align: center;
+    }
+
+    #timer {
+      margin: 0;
+      padding: 0;
+      color: green;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="heading">SMART DRUG PRESCRIPTION SYSTEM</h1>
+    <!-- add a button -->
+     <p>
+      Click this button to measure your temperature and heart rate.
+      <i class="i-text">place your thumb on the heart rate sensor and the temperature sensor in your armpit, then press the button and wait 20s after pressing the button</i>
+     </p>
+     <span class="reading">Temperature: <span id="temperature">Loading...</span> °C</span>
+     <span class="reading">Heart Rate: <span id="heartrate">Loading...</span> BPM</span>
+     <div id="timer"></div>
+     <button class="temp-btn" onclick="measureTemperatureAndHeartRate()">Measure</button>
     <form id="healthForm">
       <!-- Questions will be added dynamically here -->
     </form>
@@ -277,6 +319,30 @@
   
   return prescription;
 }
+    function measureTemperatureAndHeartRate() {
+      // Update readings every 2 seconds for 20 seconds straight and stop
+      let counter = 0;
+      const interval = setInterval(() => {
+        // Your code to run every 2 seconds
+        console.log("This code runs every 2 seconds");
+        counter += 2;
+        document.querySelector(".temp-btn").innerText = counter + " seconds";
+        fetch("/data")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("temperature").innerText = data.temperature.toFixed(2);
+                document.getElementById("heartrate").innerText = data.heartrate;
+            })
+            .catch(error => console.error("Error fetching data:", error));
+      }, 2000);
+        if (counter >= 20) {
+          clearInterval(interval);
+          console.log("Stopped after 20 seconds");
+        }
+      document.querySelector(".temp-btn").innerText = counter + " seconds";
+    }
+
+
   </script>
 </body>
 </html>
