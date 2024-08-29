@@ -112,26 +112,11 @@
       box-shadow: 0 0 0 2px #81d4fa; /* A light blue outline for accessibility */
     }
 
-    .reading {
-          font-size: 1.5rem;
-          margin: 20px 0;
-          text-align: center;
-        }
-        #temperature {
-          color: #007BFF;
-        }
-        #heartrate {
-          color: #FF5722;
-        }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="heading">SMART DRUG PRESCRIPTION SYSTEM</h1>
-    <div class="container">
-      <div class="reading">Temperature: <span id="temperature">Loading...</span> °C</div>
-      <div class="reading">Heart Rate: <span id="heartrate">Loading...</span> BPM</div>
-    </div>
     <form id="healthForm">
       <!-- Questions will be added dynamically here -->
     </form>
@@ -140,32 +125,17 @@
   </div>
 
   <script>
-    let currentTemperature, currentHeartrate;
-  document.addEventListener("DOMContentLoaded", function() {
-    function updateReadings() {
-        fetch("/data")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("temperature").innerText = data.temperature.toFixed(2);
-                document.getElementById("heartrate").innerText = data.heartrate;
-                currentHeartrate = data.heartrate;
-                currentTemperature = data.temperature.toFixed(2);
-            })
-            .catch(error => console.error("Error fetching data:", error));
-    }
-
-
     const questions = [
-      "D you have time to sleep well recently?",
+      "Are you unable to sleep?",
       "Are you currently taking any medications prescribed by your doctor?",
       "Are you currently pregnant?", 
       "Do you have difficulty breathing?",
       "Do you have a cough?",
       "Do you have headache",
-      "Do you have a fever?",
+      "Do you have malaria?",
       "Are you experiencing fatigue?",
       "Are you experiencing any pain or discomfort in your abdominal?",
-      "How would you rate your overall energy level?",
+      "Is your energy level low these days?",
       "Have you noticed any changes in your appetite?",
       "Are you experiencing nausea or vomiting?"
     ];
@@ -201,22 +171,64 @@
 
     function generatePrescription(formData) {
       let prescription = "Based on your responses, we recommend the following:";
-      
-      const questions = [
-      "D you have time to sleep well recently?",
-      "Are you currently taking any medications prescribed by your doctor?",
-      "Are you currently pregnant?", 
-      "Do you have difficulty breathing?",
-      "Do you have a cough?",
-      "Do you have headache",
-      "Do you have a fever?",
-      "Are you experiencing fatigue?",
-      "Are you experiencing any pain or discomfort in your abdominal?",
-      "How would you rate your overall energy level?",
-      "Have you noticed any changes in your appetite?",
-      "Are you experiencing nausea or vomiting?"
-      ];
+    // const questions = [
+    //   "Are you unable to sleep?",    1
+    //   "Are you currently taking any medications prescribed by your doctor?",   2
+    //   "Are you currently pregnant?",     3
+    //   "Do you have difficulty breathing?",   4
+    //   "Do you have a cough?",    5 tutolin, coflin, labocof
+    //   "Do you have headache",    6 panadol, paracetamol
+    //   "Do you have malaria?",    7 
+    //   "Are you experiencing fatigue?",   8 ibruprofin, pentax tablet, lapain, novagin
+    //   "Are you experiencing any pain or discomfort in your abdominal?",    9
+    //   "Is your energy level low these days?",   10
+    //   "are you experiencing indigestion?",    11 gelucine, mistmag(mist magesium trisilicate), 
+    //   "Are you experiencing nausea or vomiting?"   12 avomine table, taking
+    // ];
 
+      let prescribedDrugs = "prescribedDrug";
+      if (formData['q0'] === 'yes') {//   "Are you unable to sleep?",    1
+        prescribedDrugs += "\n- Take a sleeping pills like \"cenpain night\", Doxepin, Eszopiclone, Temazepam, etc";
+      }
+      if (formData['q1'] === 'yes') {//   "Are you currently taking any medications prescribed by your doctor?",   2
+        return "no drugs prescribed because of your current medications\nContinue with your current medications and consider talking to your doctor to know if what you're feeling is normal side effect of the current medication.";
+      }
+      if (formData['q2'] === 'yes') {//   "Are you currently pregnant?",     3
+        return "\n- Pregnancy is a very delicate and precautions has to be taken, ensure to register for ante-natal program and attend regularly.\nHere are other recommendations for you:\n1. Maintain a balanced diet rich in vitamins and minerals.\n2. Get regular prenatal checkups to monitor the health of you and your baby.\n3. Stay hydrated and rest whenever you feel tired.";
+      }
+      if (formData['q3'] === 'yes') {//   "Do you have difficulty breathing?",   4
+        prescribedDrugs += "\n- Lick mentor sweet like Shaltoux, Tom-Tom, etc to clear your clogged nose.\n If it doesn't improve after 5 hours or if the your breathlessness isn't due to clogged nose, consider seeing your doctor.";
+      }
+      if (formData['q4'] === 'yes') {//   "Do you have a cough?",    5
+        prescribedDrugs += "\n- consider using cough syrup like tutolin, coflin, labocof, etc.\nConsult a healthcare professional if cough is persistent.";
+      }
+      if (formData['q5'] === 'yes') {//   "Do you have headache",    6
+        prescribedDrugs += "\n- use any this medicine: paracetamol or panadol extra.\nIf the headache is persistent, You might need to see your doctor.";
+      }
+      if (formData['q6'] === 'yes') {//   "Do you have malaria?",    7
+        prescribedDrugs += "\n- Use any of this: Amatem, coartem, etc. \nConsult a doctor if the malaria persist after completing the recommended medications.";
+      }
+      if (formData['q7'] === 'yes') {//   "Are you experiencing fatigue?",   8
+        prescribedDrugs += "\n- use these drugs: Lapain tablet or Ibruprofene, Pentax, Panadol extra, etc.\nBut if you're an ulcer patient, use orphesic tablet instead. \nDiscuss fatigue with a healthcare provider if it persist.";
+      }
+      if (formData['q8'] === 'yes') {// "Are you experiencing any pain or discomfort in your abdominal?",    9
+        prescribedDrugs += "\n- You may need an evaluation for abdominal pain or discomfort, visit your doctor";
+      }
+      if (formData['q9'] === 'yes') {//   "Is your energy level low these days?",   10
+        prescribedDrugs += "\n- Ensure to eat balance diet to optimize your energy level. \n but if low energy level persist, Consult a nutritionist or doctor for changes in appetite.";
+      }
+      if (formData['q10'] === 'yes') {//   "Have you noticed any changes in your appetite?",    11
+        prescribedDrugs += "\n- Seek medical attention for nausea or vomiting.";
+      }
+      if (formData['q11'] === 'yes') { //   "Are you experiencing nausea or vomiting?"   12
+        prescribedDrugs += "\n- consider taking Key lime(locally called osan wewe), phenegan tablet, Avomine tablet, etc.";
+      }
+
+      // if all answer is no
+      if (prescribedDrugs === "Based on your responses, we recommend the following:") { // if all is no
+        prescribedDrugs += "\nNo specific drug recommendations. \n kindly see your doctor";
+
+      }
 
       // Check for all possible combinations of answers
       if (formData['q0'] === 'yes') {
@@ -259,16 +271,12 @@
 
       // Fallback message if no specific recommendations apply
       if (prescription === "Based on your responses, we recommend the following:") {
-        prescription += "\nNo specific recommendations based on your responses.";
+        prescription += "\nNo specific recommendations based on your responses. \n kindly see your doctor";
+
       }
-      
+  
   return prescription;
-  }
-
-
-    // Update readings every 2 seconds
-    setInterval(updateReadings, 2000);
-  });
+}
   </script>
 </body>
 </html>
