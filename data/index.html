@@ -1,30 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Monitor</title>
-    <style>
-        body {
-          font-family: Arial, sans-serif;
-          background-color: #f4f4f4;
-          margin: 0;
-          padding: 0;
-          line-height: 1.4;
-        }
-        .container {
-          max-width: 600px;
-          margin: 50px auto;
-          padding: 20px;
-          background: #fff;
-          border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-          text-align: center;
-          color: #333;
-        }
-        .reading {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drug Prescription System</title>
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      line-height: 1.4;
+    }
+
+    .heading {
+      margin: 2rem 0;
+    }
+
+    .container {
+      max-width: 50rem;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    form div {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .answer-btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      background-color: #00796b;
+      color: #fff;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .answer-btn:hover {
+      background-color: #004d40;
+    }
+
+    .no-btn {
+      background-color: #d32f2f;
+    }
+
+    
+    .no-btn:hover {
+      background-color: #b71c1c;
+    }
+
+    #prescriptionResult {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #e0f7fa;
+      border-radius: 0.5rem;
+    }
+
+    button[type="submit"] {
+      background-color: #00796b;
+      color: #fff;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #004d40;
+    }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #0288d1; /* A nice blue color */
+      color: #fff;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #0277bd; /* Slightly darker blue on hover */
+    }
+
+    .submit-btn:active {
+      background-color: #01579b; /* Even darker blue when pressed */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .submit-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #81d4fa; /* A light blue outline for accessibility */
+    }
+
+    .reading {
           font-size: 1.5rem;
           margin: 20px 0;
           text-align: center;
@@ -35,14 +123,152 @@
         #heartrate {
           color: #FF5722;
         }
-    </style>
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1 class="heading">SMART DRUG PRESCRIPTION SYSTEM</h1>
     <div class="container">
-        <h1>Health Monitor</h1>
-        <div class="reading">Temperature: <span id="temperature">Loading...</span> °C</div>
-        <div class="reading">Heart Rate: <span id="heartrate">Loading...</span> BPM</div>
+      <div class="reading">Temperature: <span id="temperature">Loading...</span> °C</div>
+      <div class="reading">Heart Rate: <span id="heartrate">Loading...</span> BPM</div>
     </div>
-    <script src="script.js"></script>
+    <form id="healthForm">
+      <!-- Questions will be added dynamically here -->
+    </form>
+    <div id="prescriptionResult"></div>
+    <button class="submit-btn" onclick="submitForm()">Submit</button>
+  </div>
+
+  <script>
+    let currentTemperature, currentHeartrate;
+  document.addEventListener("DOMContentLoaded", function() {
+    function updateReadings() {
+        fetch("/data")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("temperature").innerText = data.temperature.toFixed(2);
+                document.getElementById("heartrate").innerText = data.heartrate;
+                currentHeartrate = data.heartrate;
+                currentTemperature = data.temperature.toFixed(2);
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    }
+
+
+    const questions = [
+      "D you have time to sleep well recently?",
+      "Are you currently taking any medications prescribed by your doctor?",
+      "Are you currently pregnant?", 
+      "Do you have difficulty breathing?",
+      "Do you have a cough?",
+      "Do you have headache",
+      "Do you have a fever?",
+      "Are you experiencing fatigue?",
+      "Are you experiencing any pain or discomfort in your abdominal?",
+      "How would you rate your overall energy level?",
+      "Have you noticed any changes in your appetite?",
+      "Are you experiencing nausea or vomiting?"
+    ];
+
+    const questionContainer = document.getElementById('healthForm');
+
+    questions.forEach((question, index) => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <label>${question}</label><br>
+        <input  type="radio" id="q${index}yes" name="q${index}" value="yes">
+        <label class="answer-btn" for="q${index}yes">Yes</label>
+        <input type="radio" id="q${index}no" name="q${index}" value="no">
+        <label class="answer-btn no-btn" for="q${index}no">No</label>
+        <br><br>
+      `;
+      questionContainer.appendChild(div);
+    });
+
+    function getFormData() {
+      const formData = {};
+      questions.forEach((_, index) => {
+        formData[`q${index}`] = document.querySelector(`input[name="q${index}"]:checked`)?.value || 'no';
+      });
+      return formData;
+    }
+
+    function submitForm() {
+      const formData = getFormData();
+      const prescription = generatePrescription(formData);
+      document.getElementById('prescriptionResult').innerText = prescription;
+    }
+
+    function generatePrescription(formData) {
+      let prescription = "Based on your responses, we recommend the following:";
+      
+      const questions = [
+      "D you have time to sleep well recently?",
+      "Are you currently taking any medications prescribed by your doctor?",
+      "Are you currently pregnant?", 
+      "Do you have difficulty breathing?",
+      "Do you have a cough?",
+      "Do you have headache",
+      "Do you have a fever?",
+      "Are you experiencing fatigue?",
+      "Are you experiencing any pain or discomfort in your abdominal?",
+      "How would you rate your overall energy level?",
+      "Have you noticed any changes in your appetite?",
+      "Are you experiencing nausea or vomiting?"
+      ];
+
+
+      // Check for all possible combinations of answers
+      if (formData['q0'] === 'yes') {
+        prescription += "\n- You might want to consider sleep improvement strategies.";
+        return prescription;
+      }
+      if (formData['q1'] === 'yes') {
+        prescription += "\n- Continue with your current medications.";
+      }
+      if (formData['q2'] === 'yes') {
+        prescription += "\n- Consult your doctor for any pregnancy-related medications.";
+      }
+      if (formData['q3'] === 'yes') {
+        prescription += "\n- Seek medical advice for difficulty in breathing.";
+      }
+      if (formData['q4'] === 'yes') {
+        prescription += "\n- Consult a healthcare professional for persistent cough.";
+      }
+      if (formData['q5'] === 'yes') {
+        prescription += "\n- You might need treatment for headache.";
+      }
+      if (formData['q6'] === 'yes') {
+        prescription += "\n- Consult a doctor for fever.";
+      }
+      if (formData['q7'] === 'yes') {
+        prescription += "\n- Discuss fatigue with a healthcare provider.";
+      }
+      if (formData['q8'] === 'yes') {
+        prescription += "\n- You may need an evaluation for abdominal pain or discomfort.";
+      }
+      if (formData['q9'] === 'yes') {
+        prescription += "\n- Consult a nutritionist or doctor for changes in appetite.";
+      }
+      if (formData['q10'] === 'yes') {
+        prescription += "\n- Seek medical attention for nausea or vomiting.";
+      }
+      if (formData['q11'] === 'yes') {
+        prescription += "\n- Consider a general health check-up based on your overall energy level.";
+      }
+
+      // Fallback message if no specific recommendations apply
+      if (prescription === "Based on your responses, we recommend the following:") {
+        prescription += "\nNo specific recommendations based on your responses.";
+      }
+      
+  return prescription;
+  }
+
+
+    // Update readings every 2 seconds
+    setInterval(updateReadings, 2000);
+  });
+  </script>
 </body>
 </html>

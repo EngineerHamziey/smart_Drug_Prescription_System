@@ -35,6 +35,10 @@ void setup() {
   }
   Serial.println("Connected to WiFi");
 
+  // Once connected, print the IP address to the Serial Monitor
+  Serial.println("Connected to WiFi");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
   // Initialize the DS18B20 sensor
   sensors.begin();
 
@@ -66,6 +70,7 @@ void loop() {
   // Read temperature from DS18B20
   sensors.requestTemperatures();
   temperature = sensors.getTempCByIndex(0);
+  temperature = (temperature < 0) ? 0 : temperature;
 
   // Read heart rate from HW-827
   heartRate = analogRead(HEART_RATE_PIN);
