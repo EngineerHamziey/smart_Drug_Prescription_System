@@ -7,38 +7,47 @@
   
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f0f4f8;
       margin: 0;
       padding: 0;
-      line-height: 1.4;
+      line-height: 1.6;
+      color: #333;
     }
 
     .heading {
       margin: 2rem 0;
+      font-size: 2rem;
+      color: #00796b;
+      text-align: center;
+      text-transform: uppercase;
     }
 
     .container {
-      max-width: 50rem;
+      max-width: 40rem;
       margin: 2rem auto;
-      padding: 1.5rem;
-      background: #fff;
-      border-radius: 0.5rem;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      background: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      color: #00796b;
       text-align: center;
-      margin-bottom: 1rem;
     }
 
     form div {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     label {
       display: block;
       margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      color: #555;
     }
 
     .answer-btn {
@@ -48,9 +57,10 @@
       background-color: #00796b;
       color: #fff;
       border: none;
-      border-radius: 0.25rem;
+      border-radius: 0.5rem;
       cursor: pointer;
       font-size: 1rem;
+      transition: background-color 0.3s ease;
       text-align: center;
     }
 
@@ -62,99 +72,71 @@
       background-color: #d32f2f;
     }
 
-    
     .no-btn:hover {
       background-color: #b71c1c;
-    }
-
-    #prescriptionResult {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: #e0f7fa;
-      border-radius: 0.5rem;
-    }
-
-    button[type="submit"] {
-      background-color: #00796b;
-      color: #fff;
-    }
-
-    button[type="submit"]:hover {
-      background-color: #004d40;
     }
 
     .submit-btn {
       display: block;
       width: 100%;
-      padding: 0.75rem;
-      background-color: #0288d1; /* A nice blue color */
+      padding: 1rem;
+      background-color: #00796b;
       color: #fff;
       border: none;
-      border-radius: 0.25rem;
+      border-radius: 0.5rem;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 1.2rem;
       font-weight: bold;
       text-transform: uppercase;
-      transition: background-color 0.3s, box-shadow 0.3s;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      margin-top: 2rem;
     }
 
     .submit-btn:hover {
-      background-color: #0277bd; /* Slightly darker blue on hover */
-    }
-
-    .submit-btn:active {
-      background-color: #01579b; /* Even darker blue when pressed */
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      background-color: #004d40;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .submit-btn:focus {
       outline: none;
-      box-shadow: 0 0 0 2px #81d4fa; /* A light blue outline for accessibility */
+      box-shadow: 0 0 0 3px #81d4fa;
     }
 
-    .temp-btn {
-      margin-bottom: 2rem;
-      display: block;
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #0288d1; /* A nice blue color */
-      color: #fff;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
+    #prescriptionResult {
+      margin-top: 2rem;
+      padding: 2rem;
+      background: #e0f7fa;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #004d40;
+      text-align: left;
+    }
+
+    #prescriptionResult strong {
+      color: #00796b;
+    }
+
+    input[type="number"] {
+      width: calc(100% - 2rem);
+      padding: 0.5rem;
       font-size: 1rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-
-    .i-text {
-      color: red;
-    }
-
-    
-    .reading {
-      font-size: 1rem;
-      display: inline-block;
-      margin: 0.5rem;
-      text-align: center;
-    }
-
-    #timer {
-      margin: 0;
-      padding: 0;
-      color: green;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 class="heading">SMART DRUG PRESCRIPTION SYSTEM</h1>
+    <h1 class="heading">Smart Drug Prescription System</h1>
     <form id="healthForm">
       <!-- Questions will be added dynamically here -->
     </form>
     <div id="prescriptionResult"></div>
-    <button class="submit-btn" onclick="submitForm()">Submit</button>
+    <button class="submit-btn" onclick="submitForm()">Get Prescription</button>
   </div>
 
   <script>
@@ -164,10 +146,10 @@
       "Are you currently pregnant?", 
       "Do you have difficulty breathing?",
       "Do you have a cough?",
-      "Do you have headache",
+      "Do you have a headache?",
       "Do you have malaria?",
       "Are you experiencing fatigue?",
-      "Are you experiencing any pain or discomfort in your abdominal?",
+      "Are you experiencing any pain or discomfort in your abdomen?",
       "Is your energy level low these days?",
       "Have you noticed any changes in your appetite?",
       "Are you experiencing nausea or vomiting?",
@@ -182,17 +164,16 @@
 
         if (index >= 12) { // For temperature and heart rate questions
             div.innerHTML = `
-                <label>${question}</label><br>
-                <input type="number" id="q${index}" name="q${index}" step="0.1" required><br><br>
+                <label>${question}</label>
+                <input type="number" id="q${index}" name="q${index}" step="0.1" required>
             `;
         } else {
             div.innerHTML = `
-                <label>${question}</label><br>
+                <label>${question}</label>
                 <input type="radio" id="q${index}yes" name="q${index}" value="yes">
                 <label class="answer-btn" for="q${index}yes">Yes</label>
                 <input type="radio" id="q${index}no" name="q${index}" value="no">
                 <label class="answer-btn no-btn" for="q${index}no">No</label>
-                <br><br>
             `;
         }
 
@@ -214,7 +195,7 @@
     function submitForm() {
         const formData = getFormData();
         const prescription = generatePrescription(formData);
-        document.getElementById('prescriptionResult').innerText = prescription;
+        document.getElementById('prescriptionResult').innerHTML = `<strong>Prescription:</strong><br>${prescription.replace(/\n/g, '<br>')}`;
     }
 
     function generatePrescription(formData) {
@@ -250,47 +231,34 @@
             prescribedDrugs += "\n- You may need an evaluation for abdominal pain or discomfort. Visit your doctor.";
         }
         if (formData['q9'] === 'yes') {
-            prescribedDrugs += "\n- Ensure to eat a balanced diet to optimize your energy level. \nIf low energy persists, consult a nutritionist or doctor.";
+            prescribedDrugs += "\n- Consider taking a multivitamin supplement to boost energy levels. Rest and a balanced diet are also crucial.";
         }
         if (formData['q10'] === 'yes') {
-            prescribedDrugs += "\n- Seek medical attention for changes in appetite.";
+            prescribedDrugs += "\n- Changes in appetite could signal an underlying health issue. Consider seeing a healthcare professional.";
         }
         if (formData['q11'] === 'yes') {
-            prescribedDrugs += "\n- Consider taking Key lime (locally called Osan Wewe), Phenergan tablet, Avomine tablet, etc., for nausea or vomiting.";
+            prescribedDrugs += "\n- Use antiemetics like Domperidone or Ondansetron if you're experiencing nausea or vomiting.\nSeek medical attention if symptoms persist.";
         }
 
-        // Check temperature (assuming formData['q12'] holds the temperature value)
-        if (formData['q12']) {
-            const temperature = parseFloat(formData['q12']);
-            console.log(temperature);
-            if (temperature >= 37.5) {
-                prescribedDrugs += "\n- Your temperature is high. Consider taking Paracetamol to reduce fever. If it persists, see a doctor.";
-            } else if (temperature < 36.0) {
-                prescribedDrugs += "\n- Your temperature is low. Keep yourself warm and monitor your temperature. If it remains low, consult a doctor.";
-            }
+        // Check temperature and heart rate
+        const temperature = parseFloat(formData['q12']);
+        if (temperature >= 37.5) {
+            prescribedDrugs += "\n- Your temperature suggests a fever. Consider taking Paracetamol and rest. Drink plenty of fluids. See a doctor if fever persists.";
+        } else {
+            prescribedDrugs += "\n- Your temperature seems normal.";
         }
 
-        // Check heart rate (assuming formData['q13'] holds the heart rate value)
-        if (formData['q13']) {
-            const heartRate = parseInt(formData['q13']);
-            console.log(heartRate);
-            if (heartRate > 100) {
-                prescribedDrugs += "\n- Your heart rate is high. Avoid caffeine and see a doctor if it remains elevated.";
-            } else if (heartRate < 60) {
-                prescribedDrugs += "\n- Your heart rate is low. If you feel dizzy or unwell, seek medical advice.";
-            }
+        const heartRate = parseInt(formData['q13']);
+        if (heartRate < 60) {
+            prescribedDrugs += "\n- Your heart rate seems low. Consider seeing a doctor for further evaluation.";
+        } else if (heartRate > 100) {
+            prescribedDrugs += "\n- Your heart rate seems elevated. Rest and avoid stress. Consult a doctor if the high rate persists.";
+        } else {
+            prescribedDrugs += "\n- Your heart rate seems normal.";
         }
 
-        // If no specific drugs were prescribed
-        if (prescribedDrugs === "") {
-            prescribedDrugs = "\nNo specific drug recommendations. Kindly see your doctor.";
-        }
-
-        prescription += prescribedDrugs;
-
-        return prescription;
+        return prescribedDrugs ? prescription + prescribedDrugs : "No specific prescription needed based on your responses.";
     }
-</script>
-
+  </script>
 </body>
 </html>
