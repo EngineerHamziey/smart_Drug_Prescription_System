@@ -171,37 +171,37 @@
       "Is your energy level low these days?",
       "Have you noticed any changes in your appetite?",
       "Are you experiencing nausea or vomiting?",
-      "What is your temperature?",
-      "What is your heart rate?"
+      "What is your temperature in CelSius degree?",
+      "What is your heart rate in BPM?"
     ];
 
     const questionContainer = document.getElementById('healthForm');
 
     questions.forEach((question, index) => {
-      const div = document.createElement('div');
-      if( index >= 12) {
-        div.innerHTML = `
-          <label>${question}</label><br>
-          <input  type="radio" id="q${index}yes" name="q${index}" value="yes">
-          <label class="answer-btn" for="q${index}yes">Yes</label>
-          <input type="radio" id="q${index}no" name="q${index}" value="no">
-          <label class="answer-btn no-btn" for="q${index}no">No</label>
-          <br><br>
-        `;
-      }else {
-        console.log(index);
-      
-        div.innerHTML = `
-          <label>${question}</label><br>
-          <input  type="radio" id="q${index}yes" name="q${index}" value="yes">
-          <label class="answer-btn" for="q${index}yes">Yes</label>
-          <input type="radio" id="q${index}no" name="q${index}" value="no">
-          <label class="answer-btn no-btn" for="q${index}no">No</label>
-          <br><br>
-        `;
-      }
-      questionContainer.appendChild(div);
+  const div = document.createElement('div');
+  
+  if (index >= 12) { // If index is 12 or greater
+    div.innerHTML = `
+      <label>${question}</label><br>
+      <input type="number" id="q${index}" name="q${index}" step="0.1" required><br><br>
+    `;
+    // Store the value in numericAnswers object when the input changes
+    div.querySelector(`input[name="q${index}"]`).addEventListener('input', (e) => {
+      numericAnswers[`q${index}`] = e.target.value;
     });
+  } else {
+    div.innerHTML = `
+      <label>${question}</label><br>
+      <input type="radio" id="q${index}yes" name="q${index}" value="yes">
+      <label class="answer-btn" for="q${index}yes">Yes</label>
+      <input type="radio" id="q${index}no" name="q${index}" value="no">
+      <label class="answer-btn no-btn" for="q${index}no">No</label>
+      <br><br>
+    `;
+  }
+
+  questionContainer.appendChild(div);
+  });
 
     function getFormData() {
       const formData = {};
@@ -219,22 +219,6 @@
 
     function generatePrescription(formData) {
       let prescription = "Based on your responses, we recommend the following:";
-    // const questions = [
-    //   "Are you unable to sleep?",    1
-    //   "Are you currently taking any medications prescribed by your doctor?",   2
-    //   "Are you currently pregnant?",     3
-    //   "Do you have difficulty breathing?",   4
-    //   "Do you have a cough?",    5 tutolin, coflin, labocof
-    //   "Do you have headache",    6 panadol, paracetamol
-    //   "Do you have malaria?",    7 
-    //   "Are you experiencing fatigue?",   8 ibruprofin, pentax tablet, lapain, novagin
-    //   "Are you experiencing any pain or discomfort in your abdominal?",    9
-    //   "Is your energy level low these days?",   10
-    //   "are you experiencing indigestion?",    11 gelucine, mistmag(mist magesium trisilicate), 
-    //   "Are you experiencing nausea or vomiting?"   12 avomine table, taking
-    //   "What is your temperature?",
-    //   "What is your heart rate?"
-    // ];
 
       let prescribedDrugs = "prescribedDrug";
       if (formData['q0'] === 'yes') { //   "Are you unable to sleep?",    1
@@ -273,7 +257,7 @@
       if (formData['q11'] === 'yes') { //   "Are you experiencing nausea or vomiting?"   12
         prescribedDrugs += "\n- consider taking Key lime(locally called osan wewe), phenegan tablet, Avomine tablet, etc.";
       }
-      if (formData['q12'] === 'yes') { //   "What is your temperature?"    13
+      if (formData['q12'] ==='yes') { //   "What is your temperature?"    13
         prescribedDrugs += "\n- consider taking Key lime(locally called osan wewe), phenegan tablet, Avomine tablet, etc.";
       }
       
@@ -333,30 +317,6 @@
   
   return prescription;
 }
-    function measureTemperatureAndHeartRate() {
-      // Update readings every 2 seconds for 20 seconds straight and stop
-      let counter = 0;
-      const interval = setInterval(() => {
-        // Your code to run every 2 seconds
-        console.log("This code runs every 2 seconds");
-        counter += 2;
-        document.querySelector(".temp-btn").innerText = counter + " seconds";
-        fetch("/data")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("temperature").innerText = data.temperature.toFixed(2);
-                document.getElementById("heartrate").innerText = data.heartrate;
-            })
-            .catch(error => console.error("Error fetching data:", error));
-            if (counter >= 20) {
-              clearInterval(interval);
-              console.log("Stopped after 20 seconds");
-            }
-            document.querySelector(".temp-btn").innerText = "Measure";
-      }, 2000);
-    }
-
-
   </script>
 </body>
 </html>
