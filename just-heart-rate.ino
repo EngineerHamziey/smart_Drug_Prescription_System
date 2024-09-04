@@ -3,7 +3,7 @@
 #define USE_ARDUINO_INTERRUPTS true    // Set-up low-level interrupts for most acurate BPM math
 #include <PulseSensorPlayground.h>     // Includes the PulseSensorPlayground Library
 
-const int PulseWire = 0;       // 'S' Signal pin connected to A0
+const int PulseWire = 34;       // 'S' Signal pin connected to A0
 const int LED13 = 13;          // The on-board Arduino LED
 int Threshold = 550;           // Determine which Signal to "count as a beat" and which to ignore
                                
