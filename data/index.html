@@ -150,15 +150,6 @@
 <body>
   <div class="container">
     <h1 class="heading">SMART DRUG PRESCRIPTION SYSTEM</h1>
-    <!-- add a button -->
-     <p>
-      Click this button to measure your temperature and heart rate.
-      <i class="i-text">place your thumb on the heart rate sensor and the temperature sensor in your armpit, then press the button and wait 20s after pressing the button</i>
-     </p>
-     <span class="reading">Temperature: <span id="temperature">Loading...</span> °C</span>
-     <span class="reading">Heart Rate: <span id="heartrate">Loading...</span> BPM</span>
-     <div id="timer"></div>
-     <button class="temp-btn" onclick="measureTemperatureAndHeartRate()">Measure</button>
     <form id="healthForm">
       <!-- Questions will be added dynamically here -->
     </form>
@@ -179,21 +170,29 @@
       "Are you experiencing any pain or discomfort in your abdominal?",
       "Is your energy level low these days?",
       "Have you noticed any changes in your appetite?",
-      "Are you experiencing nausea or vomiting?"
+      "Are you experiencing nausea or vomiting?",
+      "What is your temperature?",
+      "What is your heart rate?"
     ];
 
     const questionContainer = document.getElementById('healthForm');
 
     questions.forEach((question, index) => {
       const div = document.createElement('div');
-      div.innerHTML = `
-        <label>${question}</label><br>
-        <input  type="radio" id="q${index}yes" name="q${index}" value="yes">
-        <label class="answer-btn" for="q${index}yes">Yes</label>
-        <input type="radio" id="q${index}no" name="q${index}" value="no">
-        <label class="answer-btn no-btn" for="q${index}no">No</label>
-        <br><br>
-      `;
+      // if( index == 12) {
+        // div.innerHTML = <p> hello </p>;
+      // }else {
+      console.log(index);
+      
+        div.innerHTML = `
+          <label>${question}</label><br>
+          <input  type="radio" id="q${index}yes" name="q${index}" value="yes">
+          <label class="answer-btn" for="q${index}yes">Yes</label>
+          <input type="radio" id="q${index}no" name="q${index}" value="no">
+          <label class="answer-btn no-btn" for="q${index}no">No</label>
+          <br><br>
+        `;
+      // }
       questionContainer.appendChild(div);
     });
 
@@ -226,10 +225,12 @@
     //   "Is your energy level low these days?",   10
     //   "are you experiencing indigestion?",    11 gelucine, mistmag(mist magesium trisilicate), 
     //   "Are you experiencing nausea or vomiting?"   12 avomine table, taking
+    //   "What is your temperature?",
+    //   "What is your heart rate?"
     // ];
 
       let prescribedDrugs = "prescribedDrug";
-      if (formData['q0'] === 'yes') {//   "Are you unable to sleep?",    1
+      if (formData['q0'] === 'yes') { //   "Are you unable to sleep?",    1
         prescribedDrugs += "\n- Take a sleeping pills like \"cenpain night\", Doxepin, Eszopiclone, Temazepam, etc";
       }
       if (formData['q1'] === 'yes') {//   "Are you currently taking any medications prescribed by your doctor?",   2
@@ -265,12 +266,18 @@
       if (formData['q11'] === 'yes') { //   "Are you experiencing nausea or vomiting?"   12
         prescribedDrugs += "\n- consider taking Key lime(locally called osan wewe), phenegan tablet, Avomine tablet, etc.";
       }
+      if (formData['q12'] === 'yes') { //   "What is your temperature?"    13
+        prescribedDrugs += "\n- consider taking Key lime(locally called osan wewe), phenegan tablet, Avomine tablet, etc.";
+      }
+      
 
       // if all answer is no
       if (prescribedDrugs === "Based on your responses, we recommend the following:") { // if all is no
         prescribedDrugs += "\nNo specific drug recommendations. \n kindly see your doctor";
 
       }
+
+      prescription += prescribedDrugs;
 
       // Check for all possible combinations of answers
       if (formData['q0'] === 'yes') {
@@ -334,12 +341,12 @@
                 document.getElementById("heartrate").innerText = data.heartrate;
             })
             .catch(error => console.error("Error fetching data:", error));
+            if (counter >= 20) {
+              clearInterval(interval);
+              console.log("Stopped after 20 seconds");
+            }
+            document.querySelector(".temp-btn").innerText = "Measure";
       }, 2000);
-        if (counter >= 20) {
-          clearInterval(interval);
-          console.log("Stopped after 20 seconds");
-        }
-      document.querySelector(".temp-btn").innerText = counter + " seconds";
     }
 
 

@@ -8,7 +8,7 @@
 
 // Replace with your network credentials
 const char* ssid = "project";
-const char* password = "123456789";
+const char* password = "xlv~`.,y_=++-__";
 
 // Data wire is plugged into pin 4 on the ESP32
 #define ONE_WIRE_BUS 5
@@ -65,6 +65,8 @@ void setup() {
 
   server.begin();
 }
+
+
 
 void loop() {
   // Read temperature from DS18B20
