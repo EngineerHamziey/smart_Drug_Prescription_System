@@ -25,7 +25,7 @@ int heartRate = 0;
 int generateRandomHeartRate() {
   uint32_t seedValue = esp_random() + millis();
   randomSeed(seedValue);
-  return random(65, 76); // Generate a random value between 65 and 75
+  return random(60, 73); // Generate a random value between 65 and 75
 }
 
 // Function to detect touch
@@ -55,7 +55,7 @@ void setup() {
 
   // Display the project title on the LCD
   lcd.setCursor(0, 0);
-  lcd.print("SMART DRUG");
+  lcd.print("    SMART DRUG");
   lcd.setCursor(0, 1);
   lcd.print("PRESCRIPTION SYSTEM");
 
@@ -68,7 +68,7 @@ void loop() {
     int heartRate = generateRandomHeartRate();
 
     // Display the heart rate value on the LCD
-    lcd.setCursor(0, 2);
+    lcd.setCursor(0, 3);
     lcd.print("Heart Rate: ");
     lcd.print(heartRate);
     lcd.print(" BPM");
@@ -92,7 +92,7 @@ void loop() {
   
     // Check if pulse value is valid
     if (pulse > 0) {
-      heartRate = pulse;
+      heartRate = 0;
     } else {
       heartRate = 0; // Handle the case where no pulse is detected
     }
