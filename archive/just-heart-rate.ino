@@ -62,7 +62,7 @@ void loop() {
     lcd.print(" BPM");
   } else {
     lcd.print("No Pulse");
-  }•••••••••••
+  }
 
   // Add a delay for stability (adjust as needed)
   delay(200);

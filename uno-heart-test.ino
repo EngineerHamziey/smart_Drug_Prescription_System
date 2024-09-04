@@ -1,47 +1,69 @@
-#include <SPI.h>
+#if 0
+
 #include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
-const int sensorPin = A0;                             // A0 is the input pin for the heart rate sensor
-int sensorValue;                                        // Variable to store the value coming from the sensor
-int count = 0;
-unsigned long starttime = 0;
-int heartrate = 0;
-boolean counted = false;
+#define HEART_RATE_PIN A0  // ADC pin for heart rate sensor
+#define THRESHOLD 550      // Threshold to detect heartbeat signal
+#define LED_PIN 2          // Optional LED to blink with each heartbeat
 
-const int D13 = 13;
+LiquidCrystal_I2C lcd(0x27, 20, 4);  // Initialize LCD with I2C address and dimensions
 
-void setup (void) {
-  Serial.begin (115200);       
-  pinMode(D13, OUTPUT);                      
+// Variables to store heart rate calculation
+unsigned long lastBeatTime = 0;
+unsigned int beatsPerMinute = 0;
+int beatCount = 0;
+int lastSignal = 0;
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(115200);
+
+  // Initialize the LCD display
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Heart Rate Monitor");
+
+  // Set LED pin as output (optional)
+  pinMode(LED_PIN, OUTPUT);
 }
 
+void loop() {
+  int signal = analogRead(HEART_RATE_PIN);  // Read the heart rate sensor's analog value
 
-void loop () { 
-  starttime = millis();
-    while (millis()<starttime+20000)                                            // Reading pulse sensor for 20 seconds
-    { sensorValue = analogRead(sensorPin);
-        Serial.println ("Sensor Value = " + String(sensorValue));
-          delay(50);
-      if ((sensorValue >= 590 && sensorValue <=680) && counted == false)    // Threshold value is 590 (~ 2.7V)
-      {  count++;
-        digitalWrite (D13,HIGH);
-          delay (10);       
-        digitalWrite (D13, LOW);
-        counted = true;
-        }
-      else if (sensorValue < 590)
-       {  counted = false;
-          digitalWrite (D13, LOW);
-          }
-      }
-    Serial.print ("Pulse ");
-    Serial.println (count);
-    heartrate = (count)*3;                              // Multiply the count by 3 to get beats per minute
-    Serial.println ();
-    Serial.print ("BPM = ");
-    Serial.println (heartrate);                         // Display BPM in the Serial Monitor
-    Serial.println ();
-    count = 0;
-    
-    //delay(1000);
+  // Detect rising edge (heartbeat)
+  if (signal > THRESHOLD && lastSignal <= THRESHOLD) {
+    unsigned long currentTime = millis();
+    unsigned long timeDifference = currentTime - lastBeatTime;
+
+    // Calculate BPM if more than 300ms passed since the last beat
+    if (timeDifference > 300) {
+      beatsPerMinute = 60000 / timeDifference;  // Calculate BPM (60000 ms in one minute)
+      lastBeatTime = currentTime;
+      beatCount++;
+
+      // Blink LED on heartbeat (optional)
+      digitalWrite(LED_PIN, HIGH);
+      delay(50);
+      digitalWrite(LED_PIN, LOW);
+    }
+  }
+
+  lastSignal = signal;  // Store the current signal as the last signal for edge detection
+
+  // Display the heart rate on the LCD
+  lcd.setCursor(0, 1);
+  lcd.print("BPM: ");
+  lcd.print(beatsPerMinute);
+
+  // Send signal data to Serial Plotter (optional for debugging)
+  Serial.print("Signal: ");
+  Serial.print(signal);
+  Serial.print("\tBPM: ");
+  Serial.println(beatsPerMinute);
+
+  delay(20);  // Small delay for stability
 }
+
+#endif

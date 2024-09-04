@@ -13,6 +13,6 @@ void beginTheSerialMonitor() {
 * #define BOT_TOKEN "6555915313:AAGtNf4aADfpbgbe8S3L-83bSeLerVB8LQE"
 * add age prompt
 * remove malaria
-make the precription more formal, give one sentence not heighlighting each problem one by one .
+make the precription more formal, give one sentence not heighlighting each problem one by one 
 * 
 */
