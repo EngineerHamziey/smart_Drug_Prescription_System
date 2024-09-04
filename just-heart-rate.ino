@@ -1,3 +1,5 @@
+#if 0
+
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -60,8 +62,10 @@ void loop() {
     lcd.print(" BPM");
   } else {
     lcd.print("No Pulse");
-  }
+  }•••••••••••
 
   // Add a delay for stability (adjust as needed)
   delay(200);
 }
+
+#endif
