@@ -4,6 +4,9 @@ void beginTheSerialMonitor() {
 
 //====================================================================================================================================
 /*
+  - put temperature sensor in your armpit till it stops changing value
+  - then place your thumb on the heart rate sensor till it becomes stable,
+  - restart the system to measure again
 * System will measure temperature and heart-rate
 * System will prescribe drug and further deatails will be sent to user's telegram
 * we should have 10 prescription cases

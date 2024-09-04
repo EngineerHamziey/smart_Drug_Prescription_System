@@ -1,3 +1,4 @@
+#if 0
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -20,16 +21,19 @@ void setup() {
   lcd.print("Touch Detection");
 }
 
-void loop() {
-  // Read analog value from the sensor
+// Function to detect touch
+bool touchDetected() {
   int sensorValue = analogRead(HEART_RATE_PIN);
-  
   // Log the sensor value to the serial monitor
   Serial.print("Analog Value: ");
   Serial.println(sensorValue);
+  // Return true if touch is detected, false otherwise
+  return sensorValue <= 3;
+}
 
-  // Check if the sensor value is less than or equal to 3
-  if (sensorValue <= 3) {
+void loop() {
+  // Check if touch is detected
+  if (touchDetected()) {
     Serial.println("Touch Detected!");
     lcd.setCursor(0, 1);
     lcd.print("Touch Detected! ");
@@ -42,3 +46,4 @@ void loop() {
   // Add a delay for stability
   delay(500);
 }
+#endif
