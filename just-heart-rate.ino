@@ -1,38 +1,67 @@
-#if 0
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
-#define USE_ARDUINO_INTERRUPTS true    // Set-up low-level interrupts for most acurate BPM math
-#include <PulseSensorPlayground.h>     // Includes the PulseSensorPlayground Library
+// Pin for heart rate sensor
+#define HEART_RATE_PIN 32
 
-const int PulseWire = 34;       // 'S' Signal pin connected to A0
-const int LED13 = 13;          // The on-board Arduino LED
-int Threshold = 550;           // Determine which Signal to "count as a beat" and which to ignore
-                               
-PulseSensorPlayground pulseSensor;  // Creates an object
+// Variables for heart rate detection
+int signalValue = 0;        // Holds the raw analog value from the sensor
+int threshold = 550;        // Threshold value to detect heartbeats, adjust as needed
+unsigned long lastBeatTime = 0; // Time of the last beat detected
+int beatCount = 0;          // Number of beats detected
+float heartRate = 0.0;      // Calculated heart rate in BPM
+
+// LCD display
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup() {
-	Serial.begin(115200);
+  // Start the serial communication
+  Serial.begin(115200);
 
-	// Configure the PulseSensor object, by assigning our variables to it
-	pulseSensor.analogInput(PulseWire);   
-	pulseSensor.blinkOnPulse(LED13);       // Blink on-board LED with heartbeat
-	pulseSensor.setThreshold(Threshold);   
+  // Initialize the LCD
+  lcd.init();
+  lcd.backlight();
 
-	// Double-check the "pulseSensor" object was created and began seeing a signal
-	if (pulseSensor.begin()) {
-		Serial.println("PulseSensor object created!");
-	}
+  // Display the project title on the LCD
+  lcd.setCursor(0, 0);
+  lcd.print("Heart Rate Monitor");
+
+  delay(2000);  // Delay to show the title for 2 seconds
+
+  // Clear the screen before displaying data
+  lcd.clear();
 }
 
 void loop() {
-	int myBPM = pulseSensor.getBeatsPerMinute();      // Calculates BPM
+  // Read the analog value from the heart rate sensor
+  signalValue = analogRead(HEART_RATE_PIN);
 
-	if (pulseSensor.sawStartOfBeat()) {               // Constantly test to see if a beat happened
-		Serial.println("♥  A HeartBeat Happened ! "); // If true, print a message
-		Serial.print("BPM: ");
-		Serial.println(myBPM);                        // Print the BPM value
-		}
+  // Detect a beat when the signal exceeds the threshold
+  if (signalValue > threshold) {
+    unsigned long currentTime = millis();
+    if (currentTime - lastBeatTime > 300) { // Minimum time between beats to avoid noise
+      // Calculate heart rate in BPM
+      heartRate = 60000.0 / (currentTime - lastBeatTime);
+      lastBeatTime = currentTime;
+      beatCount++;
+    }
+  }
 
-	delay(20);
+  // Display the raw signal value on the Serial Monitor for debugging
+  Serial.print("Signal Value: ");
+  Serial.println(signalValue);
+
+  // Display the heart rate on the LCD
+  lcd.setCursor(0, 0);
+  lcd.print("Heart Rate: ");
+  if (heartRate > 0) {
+    Serial.println("heart rate = " + String(heartRate));
+    lcd.print(heartRate);
+    lcd.print(" BPM");
+  } else {
+    lcd.print("No Pulse");
+  }
+
+  // Add a delay for stability (adjust as needed)
+  delay(200);
 }
-
-#endif

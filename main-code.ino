@@ -1,4 +1,4 @@
-#if 1
+#if 0
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -70,7 +70,7 @@ void loop() {
   lcd.setCursor(0, 2);
   lcd.print("Temperature: ");
   lcd.print(temperature);
-  lcd.print(" C");
+  lcd.print("C");
 
   // Display the heart rate on the LCD
   lcd.setCursor(0, 3);
