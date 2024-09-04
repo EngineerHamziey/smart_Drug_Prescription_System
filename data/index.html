@@ -171,152 +171,126 @@
       "Is your energy level low these days?",
       "Have you noticed any changes in your appetite?",
       "Are you experiencing nausea or vomiting?",
-      "What is your temperature in CelSius degree?",
+      "What is your temperature in Celsius degrees?",
       "What is your heart rate in BPM?"
     ];
 
     const questionContainer = document.getElementById('healthForm');
 
     questions.forEach((question, index) => {
-  const div = document.createElement('div');
-  
-  if (index >= 12) { // If index is 12 or greater
-    div.innerHTML = `
-      <label>${question}</label><br>
-      <input type="number" id="q${index}" name="q${index}" step="0.1" required><br><br>
-    `;
-    // Store the value in numericAnswers object when the input changes
-    div.querySelector(`input[name="q${index}"]`).addEventListener('input', (e) => {
-      numericAnswers[`q${index}`] = e.target.value;
-    });
-  } else {
-    div.innerHTML = `
-      <label>${question}</label><br>
-      <input type="radio" id="q${index}yes" name="q${index}" value="yes">
-      <label class="answer-btn" for="q${index}yes">Yes</label>
-      <input type="radio" id="q${index}no" name="q${index}" value="no">
-      <label class="answer-btn no-btn" for="q${index}no">No</label>
-      <br><br>
-    `;
-  }
+        const div = document.createElement('div');
 
-  questionContainer.appendChild(div);
-  });
+        if (index >= 12) { // For temperature and heart rate questions
+            div.innerHTML = `
+                <label>${question}</label><br>
+                <input type="number" id="q${index}" name="q${index}" step="0.1" required><br><br>
+            `;
+        } else {
+            div.innerHTML = `
+                <label>${question}</label><br>
+                <input type="radio" id="q${index}yes" name="q${index}" value="yes">
+                <label class="answer-btn" for="q${index}yes">Yes</label>
+                <input type="radio" id="q${index}no" name="q${index}" value="no">
+                <label class="answer-btn no-btn" for="q${index}no">No</label>
+                <br><br>
+            `;
+        }
+
+        questionContainer.appendChild(div);
+    });
 
     function getFormData() {
-      const formData = {};
-      questions.forEach((_, index) => {
-        formData[`q${index}`] = document.querySelector(`input[name="q${index}"]:checked`)?.value || 'no';
-      });
-      return formData;
+        const formData = {};
+        questions.forEach((_, index) => {
+            if (index >= 12) {
+                formData[`q${index}`] = document.querySelector(`input[name="q${index}"]`)?.value || '';
+            } else {
+                formData[`q${index}`] = document.querySelector(`input[name="q${index}"]:checked`)?.value || 'no';
+            }
+        });
+        return formData;
     }
 
     function submitForm() {
-      const formData = getFormData();
-      const prescription = generatePrescription(formData);
-      document.getElementById('prescriptionResult').innerText = prescription;
+        const formData = getFormData();
+        const prescription = generatePrescription(formData);
+        document.getElementById('prescriptionResult').innerText = prescription;
     }
 
     function generatePrescription(formData) {
-      let prescription = "Based on your responses, we recommend the following:";
+        let prescription = "Based on your responses, we recommend the following:";
+        let prescribedDrugs = "";
 
-      let prescribedDrugs = "prescribedDrug";
-      if (formData['q0'] === 'yes') { //   "Are you unable to sleep?",    1
-        prescribedDrugs += "\n- Take a sleeping pills like \"cenpain night\", Doxepin, Eszopiclone, Temazepam, etc";
-      }
-      if (formData['q1'] === 'yes') {//   "Are you currently taking any medications prescribed by your doctor?",   2
-        return "no drugs prescribed because of your current medications\nContinue with your current medications and consider talking to your doctor to know if what you're feeling is normal side effect of the current medication.";
-      }
-      if (formData['q2'] === 'yes') {//   "Are you currently pregnant?",     3
-        return "\n- Pregnancy is a very delicate and precautions has to be taken, ensure to register for ante-natal program and attend regularly.\nHere are other recommendations for you:\n1. Maintain a balanced diet rich in vitamins and minerals.\n2. Get regular prenatal checkups to monitor the health of you and your baby.\n3. Stay hydrated and rest whenever you feel tired.";
-      }
-      if (formData['q3'] === 'yes') {//   "Do you have difficulty breathing?",   4
-        prescribedDrugs += "\n- Lick mentor sweet like Shaltoux, Tom-Tom, etc to clear your clogged nose.\n If it doesn't improve after 5 hours or if the your breathlessness isn't due to clogged nose, consider seeing your doctor.";
-      }
-      if (formData['q4'] === 'yes') {//   "Do you have a cough?",    5
-        prescribedDrugs += "\n- consider using cough syrup like tutolin, coflin, labocof, etc.\nConsult a healthcare professional if cough is persistent.";
-      }
-      if (formData['q5'] === 'yes') {//   "Do you have headache",    6
-        prescribedDrugs += "\n- use any this medicine: paracetamol or panadol extra.\nIf the headache is persistent, You might need to see your doctor.";
-      }
-      if (formData['q6'] === 'yes') {//   "Do you have malaria?",    7
-        prescribedDrugs += "\n- Use any of this: Amatem, coartem, etc. \nConsult a doctor if the malaria persist after completing the recommended medications.";
-      }
-      if (formData['q7'] === 'yes') {//   "Are you experiencing fatigue?",   8
-        prescribedDrugs += "\n- use these drugs: Lapain tablet or Ibruprofene, Pentax, Panadol extra, etc.\nBut if you're an ulcer patient, use orphesic tablet instead. \nDiscuss fatigue with a healthcare provider if it persist.";
-      }
-      if (formData['q8'] === 'yes') {// "Are you experiencing any pain or discomfort in your abdominal?",    9
-        prescribedDrugs += "\n- You may need an evaluation for abdominal pain or discomfort, visit your doctor";
-      }
-      if (formData['q9'] === 'yes') {//   "Is your energy level low these days?",   10
-        prescribedDrugs += "\n- Ensure to eat balance diet to optimize your energy level. \n but if low energy level persist, Consult a nutritionist or doctor for changes in appetite.";
-      }
-      if (formData['q10'] === 'yes') {//   "Have you noticed any changes in your appetite?",    11
-        prescribedDrugs += "\n- Seek medical attention for nausea or vomiting.";
-      }
-      if (formData['q11'] === 'yes') { //   "Are you experiencing nausea or vomiting?"   12
-        prescribedDrugs += "\n- consider taking Key lime(locally called osan wewe), phenegan tablet, Avomine tablet, etc.";
-      }
-      if (formData['q12'] ==='yes') { //   "What is your temperature?"    13
-        prescribedDrugs += "\n- consider taking Key lime(locally called osan wewe), phenegan tablet, Avomine tablet, etc.";
-      }
-      
+        // Check responses for the first 12 questions
+        if (formData['q0'] === 'yes') {
+            prescribedDrugs += "\n- Take a sleeping pill like \"cenpain night\", Doxepin, Eszopiclone, Temazepam, etc.";
+        }
+        if (formData['q1'] === 'yes') {
+            return "No drugs prescribed because of your current medications.\nContinue with your current medications and consider talking to your doctor to know if what you're feeling is a normal side effect.";
+        }
+        if (formData['q2'] === 'yes') {
+            return "\n- Pregnancy is delicate; ensure to register for an antenatal program and attend regularly.\nHere are other recommendations:\n1. Maintain a balanced diet rich in vitamins and minerals.\n2. Get regular prenatal checkups.\n3. Stay hydrated and rest.";
+        }
+        if (formData['q3'] === 'yes') {
+            prescribedDrugs += "\n- Lick menthol sweets like Shaltoux, Tom-Tom, etc., to clear your clogged nose. If it doesn't improve after 5 hours, or if your breathlessness isn't due to a clogged nose, consider seeing your doctor.";
+        }
+        if (formData['q4'] === 'yes') {
+            prescribedDrugs += "\n- Consider using cough syrup like Tutolin, Coflin, Labocof, etc.\nConsult a healthcare professional if the cough persists.";
+        }
+        if (formData['q5'] === 'yes') {
+            prescribedDrugs += "\n- Use medication like Paracetamol or Panadol Extra.\nIf the headache persists, you might need to see your doctor.";
+        }
+        if (formData['q6'] === 'yes') {
+            prescribedDrugs += "\n- Use antimalarials like Amatem or Coartem. \nConsult a doctor if malaria persists after completing the recommended medications.";
+        }
+        if (formData['q7'] === 'yes') {
+            prescribedDrugs += "\n- Use these drugs: Lapain tablet, Ibuprofen, Pentax, Panadol Extra, etc.\nIf you have an ulcer, use Orphesic tablet instead. \nDiscuss fatigue with a healthcare provider if it persists.";
+        }
+        if (formData['q8'] === 'yes') {
+            prescribedDrugs += "\n- You may need an evaluation for abdominal pain or discomfort. Visit your doctor.";
+        }
+        if (formData['q9'] === 'yes') {
+            prescribedDrugs += "\n- Ensure to eat a balanced diet to optimize your energy level. \nIf low energy persists, consult a nutritionist or doctor.";
+        }
+        if (formData['q10'] === 'yes') {
+            prescribedDrugs += "\n- Seek medical attention for changes in appetite.";
+        }
+        if (formData['q11'] === 'yes') {
+            prescribedDrugs += "\n- Consider taking Key lime (locally called Osan Wewe), Phenergan tablet, Avomine tablet, etc., for nausea or vomiting.";
+        }
 
-      // if all answer is no
-      if (prescribedDrugs === "Based on your responses, we recommend the following:") { // if all is no
-        prescribedDrugs += "\nNo specific drug recommendations. \n kindly see your doctor";
+        // Check temperature (assuming formData['q12'] holds the temperature value)
+        if (formData['q12']) {
+            const temperature = parseFloat(formData['q12']);
+            console.log(temperature);
+            if (temperature >= 37.5) {
+                prescribedDrugs += "\n- Your temperature is high. Consider taking Paracetamol to reduce fever. If it persists, see a doctor.";
+            } else if (temperature < 36.0) {
+                prescribedDrugs += "\n- Your temperature is low. Keep yourself warm and monitor your temperature. If it remains low, consult a doctor.";
+            }
+        }
 
-      }
+        // Check heart rate (assuming formData['q13'] holds the heart rate value)
+        if (formData['q13']) {
+            const heartRate = parseInt(formData['q13']);
+            console.log(heartRate);
+            if (heartRate > 100) {
+                prescribedDrugs += "\n- Your heart rate is high. Avoid caffeine and see a doctor if it remains elevated.";
+            } else if (heartRate < 60) {
+                prescribedDrugs += "\n- Your heart rate is low. If you feel dizzy or unwell, seek medical advice.";
+            }
+        }
 
-      prescription += prescribedDrugs;
+        // If no specific drugs were prescribed
+        if (prescribedDrugs === "") {
+            prescribedDrugs = "\nNo specific drug recommendations. Kindly see your doctor.";
+        }
 
-      // Check for all possible combinations of answers
-      if (formData['q0'] === 'yes') {
-        prescription += "\n- You might want to consider sleep improvement strategies.";
+        prescription += prescribedDrugs;
+
         return prescription;
-      }
-      if (formData['q1'] === 'yes') {
-        prescription += "\n- Continue with your current medications.";
-      }
-      if (formData['q2'] === 'yes') {
-        prescription += "\n- Consult your doctor for any pregnancy-related medications.";
-      }
-      if (formData['q3'] === 'yes') {
-        prescription += "\n- Seek medical advice for difficulty in breathing.";
-      }
-      if (formData['q4'] === 'yes') {
-        prescription += "\n- Consult a healthcare professional for persistent cough.";
-      }
-      if (formData['q5'] === 'yes') {
-        prescription += "\n- You might need treatment for headache.";
-      }
-      if (formData['q6'] === 'yes') {
-        prescription += "\n- Consult a doctor for fever.";
-      }
-      if (formData['q7'] === 'yes') {
-        prescription += "\n- Discuss fatigue with a healthcare provider.";
-      }
-      if (formData['q8'] === 'yes') {
-        prescription += "\n- You may need an evaluation for abdominal pain or discomfort.";
-      }
-      if (formData['q9'] === 'yes') {
-        prescription += "\n- Consult a nutritionist or doctor for changes in appetite.";
-      }
-      if (formData['q10'] === 'yes') {
-        prescription += "\n- Seek medical attention for nausea or vomiting.";
-      }
-      if (formData['q11'] === 'yes') {
-        prescription += "\n- Consider a general health check-up based on your overall energy level.";
-      }
+    }
+</script>
 
-      // Fallback message if no specific recommendations apply
-      if (prescription === "Based on your responses, we recommend the following:") {
-        prescription += "\nNo specific recommendations based on your responses. \n kindly see your doctor";
-
-      }
-  
-  return prescription;
-}
-  </script>
 </body>
 </html>
