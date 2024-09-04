@@ -179,10 +179,17 @@
 
     questions.forEach((question, index) => {
       const div = document.createElement('div');
-      // if( index == 12) {
-        // div.innerHTML = <p> hello </p>;
-      // }else {
-      console.log(index);
+      if( index >= 12) {
+        div.innerHTML = `
+          <label>${question}</label><br>
+          <input  type="radio" id="q${index}yes" name="q${index}" value="yes">
+          <label class="answer-btn" for="q${index}yes">Yes</label>
+          <input type="radio" id="q${index}no" name="q${index}" value="no">
+          <label class="answer-btn no-btn" for="q${index}no">No</label>
+          <br><br>
+        `;
+      }else {
+        console.log(index);
       
         div.innerHTML = `
           <label>${question}</label><br>
@@ -192,7 +199,7 @@
           <label class="answer-btn no-btn" for="q${index}no">No</label>
           <br><br>
         `;
-      // }
+      }
       questionContainer.appendChild(div);
     });
 
