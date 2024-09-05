@@ -25,7 +25,7 @@ int heartRate = 0;
 int generateRandomHeartRate() {
   uint32_t seedValue = esp_random() + millis();
   randomSeed(seedValue);
-  return random(60, 73); // Generate a random value between 65 and 75
+  return random(60, 73); // Generate a random value between 60 and 72
 }
 
 // Function to detect touch
@@ -36,6 +36,15 @@ bool touchDetected() {
   Serial.println(sensorValue);
   // Return true if touch is detected, false otherwise
   return sensorValue <= 3;
+}
+
+// Function to display text with a typing effect
+void displayTypingEffect(String text, int row) {
+  lcd.setCursor(0, row);
+  for (int i = 0; i < text.length(); i++) {
+    lcd.print(text[i]);
+    delay(50); // Adjust typing speed
+  }
 }
 
 void setup() {
@@ -53,29 +62,30 @@ void setup() {
   lcd.init();
   lcd.backlight();
 
-  // Display the project title on the LCD
-  lcd.setCursor(0, 0);
-  lcd.print("    SMART DRUG");
-  lcd.setCursor(0, 1);
-  lcd.print("PRESCRIPTION SYSTEM");
+  // Display the project title with a typing effect
+  displayTypingEffect("    SMART DRUG", 0);
+  displayTypingEffect("PRESCRIPTION SYSTEM", 1);
 
-  delay(3000);  // Delay to show the title for 3 seconds
+  delay(1000);  // Delay to show the title for 3 seconds
 }
 
 void loop() {
   // Check if touch is detected
   if (touchDetected()) {
-    int heartRate = generateRandomHeartRate();
+    int targetHeartRate = generateRandomHeartRate();
 
-    // Display the heart rate value on the LCD
-    lcd.setCursor(0, 3);
-    lcd.print("Heart Rate: ");
-    lcd.print(heartRate);
-    lcd.print(" BPM");
+    // Simulate loading the heart rate value
+    for (int i = 0; i <= targetHeartRate; i++) {
+      lcd.setCursor(0, 3);
+      lcd.print("Heart Rate: ");
+      lcd.print(i);
+      lcd.print(" BPM");
+      delay(3); // Adjust loading speed
+    }
 
     // Log the heart rate value to the serial monitor
     Serial.print("Heart Rate: ");
-    Serial.println(heartRate);
+    Serial.println(targetHeartRate);
 
     // Stop further execution
     while (true) {
@@ -110,6 +120,6 @@ void loop() {
     lcd.print(" BPM");
 
     // Add a delay for stability
-    delay(2000);
+    delay(1000);
   }
 }
