@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Random Numbers</title>
+</head>
+<body>
+  <h1>Random Numbers from ESP32</h1>
+  <label for="ipAddress">ESP32 IP Address: </label>
+  <input type="text" id="ipAddress" placeholder="e.g. 192.168.1.100">
+  <button id="connectBtn">Connect</button>
+
+  <p id="status">Status: Not connected</p>
+  <p id="random1">Random 1: </p>
+  <p id="random2">Random 2: </p>
+
+  <script>
+    let ws;
+    const connectBtn = document.getElementById('connectBtn');
+    
+    connectBtn.onclick = connectToSocket; 
+    
+    function connectToSocket() {
+      const ipAddress = document.getElementById('ipAddress').value;
+      const wsUrl = `ws://${ipAddress}:81/`; // Connect to WebSocket server at ESP32 IP and port 81
+
+      ws = new WebSocket(wsUrl); //
+
+      ws.onopen = function() {//once connection is established
+        document.getElementById('status').textContent = 'Status: Connected';
+        console.log('Connected to WebSocket server');
+      };
+
+      ws.onmessage = function(event) { //once a new message is received
+        const data = JSON.parse(event.data);// the string into object
+        console.log(data);
+        document.getElementById('random1').textContent = 'Random 1: ' + data.random1;
+        document.getElementById('random2').textContent = 'Random 2: ' + data.random2;
+      };
+
+      ws.onclose = function() { //once the connection is closed
+        document.getElementById('status').textContent = 'Status: Disconnected';
+        console.log('Disconnected from WebSocket server');
+      };
+
+      ws.onerror = function() { //once error is encountered in connection
+        document.getElementById('status').textContent = 'Status: Connection Error';
+        console.log('Error connecting to WebSocket server');
+      };
+    };
+
+
+  </script>
+</body>
+</html>
