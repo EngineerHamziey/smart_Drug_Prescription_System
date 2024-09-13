@@ -25,15 +25,22 @@ PulseSensorPlayground pulseSensor;
 // WebSocket server on port 81
 WebSocketsServer webSocket = WebSocketsServer(81);
 
-// Create an instance of the LCD
+// Create an instance of the LCD (20x4 display)
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 float temperature = 0.0;
 int heartRate = 0;
+String ipAddress = "";
 
 void setup() {
   // Start the serial communication
   Serial.begin(115200);
+
+  // Initialize the LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Connecting to WiFi...");
 
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
@@ -42,6 +49,17 @@ void setup() {
     Serial.println("Connecting to WiFi...");
   }
   Serial.println("Connected to WiFi");
+
+  // Get the IP address
+  ipAddress = WiFi.localIP().toString();
+  Serial.println("IP Address: " + ipAddress);
+
+  // Display the IP address on the LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("IP:");
+  lcd.setCursor(3, 0);
+  lcd.print(ipAddress);
 
   // Start the WebSocket server
   webSocket.begin();
@@ -53,10 +71,6 @@ void setup() {
   // Initialize the PulseSensor
   pulseSensor.analogInput(HEART_RATE_PIN);
   pulseSensor.begin();
-
-  // Initialize the LCD
-  lcd.init();
-  lcd.backlight();
 }
 
 // Function to handle WebSocket events
@@ -79,12 +93,23 @@ void loop() {
     temperature = 0;
   }
 
-  // Simulate a random heart rate (or read from actual sensor)
+  // Simulate a random heart rate (or read from the actual sensor)
   heartRate = random(60, 73);
+
+  // Update the LCD with temperature and heart rate data
+  lcd.setCursor(0, 1);  // Row 1
+  lcd.print("Temp:");
+  lcd.print(temperature);
+  lcd.print("C  ");
+  
+  lcd.setCursor(0, 2);  // Row 2
+  lcd.print("HR:");
+  lcd.print(heartRate);
+  lcd.print(" BPM ");
 
   // Send the heart rate and temperature data via WebSocket
   String data = String("{\"heartRate\":") + heartRate + ",\"temperature\":" + temperature + "}";
   webSocket.broadcastTXT(data);
 
-  delay(1000); // Send data every second
+  delay(1000); // Send data and update every second
 }
