@@ -149,7 +149,7 @@ void loop() {
     String data = String("{\"heartRate\":") + targetHeartRate + ",\"temperature\":" + temperature + "}";
     webSocket.broadcastTXT(data);
     Serial.println("Sent: " + data);
-    delay(2000); // Send new random numbers every 5 seconds
+    // delay(2000); // Send new random numbers every 5 seconds
 
     heartRate = targetHeartRate;
     updateLcd();
@@ -170,5 +170,5 @@ void loop() {
   String data = String("{\"heartRate\":") + heartRate + ",\"temperature\":" + temperature + "}";
   webSocket.broadcastTXT(data);
   Serial.println("Sent: " + data);
-  delay(2000); // Send new random numbers every 5 seconds
+  delay(300); // Send new random numbers every 5 seconds
 }
