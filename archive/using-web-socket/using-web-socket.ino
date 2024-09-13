@@ -28,6 +28,9 @@ WebSocketsServer webSocket = WebSocketsServer(81);
 // Create an instance of the LCD (20x4 display)
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
+// Create an instance of the HTTP server
+WebServer httpServer(80);
+
 float temperature = 0.0;
 int heartRate = 0;
 String ipAddress = "";
@@ -71,6 +74,12 @@ void setup() {
   // Initialize the PulseSensor
   pulseSensor.analogInput(HEART_RATE_PIN);
   pulseSensor.begin();
+
+  // Set up the HTTP server routes
+  httpServer.on("/", handleRoot);
+
+  // Start the HTTP server
+  httpServer.begin();
 }
 
 // Function to handle WebSocket events
@@ -82,9 +91,23 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
   }
 }
 
+// Function to handle HTTP GET requests
+void handleRoot() {
+  String html = "<html><body>";
+  html += "<h1>ESP32 Sensor Data</h1>";
+  html += "<p>Temperature: " + String(temperature) + " C</p>";
+  html += "<p>Heart Rate: " + String(heartRate) + " BPM</p>";
+  html += "</body></html>";
+  
+  httpServer.send(200, "text/html", html);
+}
+
 void loop() {
   // Handle WebSocket communication
   webSocket.loop();
+
+  // Handle HTTP server requests
+  httpServer.handleClient();
 
   // Read temperature from DS18B20
   sensors.requestTemperatures();
@@ -100,7 +123,7 @@ void loop() {
   lcd.setCursor(0, 1);  // Row 1
   lcd.print("Temp:");
   lcd.print(temperature);
-  lcd.print("C  ");
+  lcd.print(" C  ");
   
   lcd.setCursor(0, 2);  // Row 2
   lcd.print("HR:");
