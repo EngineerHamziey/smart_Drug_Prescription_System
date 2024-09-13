@@ -49,6 +49,17 @@ void onEvent(uint8_t client_num, WStype_t type, uint8_t * payload, size_t length
   }
 }
 
+
+// Function to detect touch
+bool touchDetected() {
+  int sensorValue = analogRead(HEART_RATE_PIN);
+  // Log the sensor value to the serial monitor
+  Serial.print("Analog Value: ");
+  Serial.println(sensorValue);
+  // Return true if touch is detected, false otherwise
+  return sensorValue <= 3;
+}
+
 void setup() {// Start the serial communication
   Serial.begin(115200);
 
@@ -94,6 +105,19 @@ void setup() {// Start the serial communication
   pulseSensor.begin();
 }
 
+void updateLcd() {
+  // Update the LCD with temperature and heart rate data
+  lcd.setCursor(0, 2);  // Row 1
+  lcd.print("Temperature: ");
+  lcd.print(temperature);
+  lcd.print("C  ");
+  
+  lcd.setCursor(0, 3);
+  lcd.print("Heart Rate: ");
+  lcd.print(heartRate);
+  lcd.print(" BPM");
+}
+
 void loop() {
   webSocket.loop();
 
@@ -105,19 +129,42 @@ void loop() {
     temperature = 0;
   }
 
-  // Simulate a random heart rate (or read from the actual sensor)
-  heartRate = random(60, 73);
+  if (touchDetected()) {
+    int targetHeartRate = random(60, 73);
 
-  // Update the LCD with temperature and heart rate data
-  lcd.setCursor(0, 1);  // Row 1
-  lcd.print("Temp:");
-  lcd.print(temperature);
-  lcd.print(" C  ");
+    // Simulate loading the heart rate value
+    for (int i = 0; i <= targetHeartRate; i++) {
+      lcd.setCursor(0, 3);
+      lcd.print("Heart Rate: ");
+      lcd.print(i);
+      lcd.print(" BPM");
+      delay(3); // Adjust loading speed
+    }
+
+    // Log the heart rate value to the serial monitor
+    Serial.print("Heart Rate: ");
+    Serial.println(targetHeartRate);
+
+    // Send the heart rate and temperature data via WebSocket
+    String data = String("{\"heartRate\":") + targetHeartRate + ",\"temperature\":" + temperature + "}";
+    webSocket.broadcastTXT(data);
+    Serial.println("Sent: " + data);
+    delay(2000); // Send new random numbers every 5 seconds
+
+    heartRate = targetHeartRate;
+    updateLcd();
+
+    // Stop further execution
+    while (true) {
+      webSocket.loop();
+      webSocket.broadcastTXT(data);
+      
+      delay(2000); // Infinite loop to stop further execution
+    }
+  }
+  updateLcd();
+
   
-  lcd.setCursor(0, 2);  // Row 2
-  lcd.print("HR:");
-  lcd.print(heartRate);
-  lcd.print(" BPM ");
 
   // Send the heart rate and temperature data via WebSocket
   String data = String("{\"heartRate\":") + heartRate + ",\"temperature\":" + temperature + "}";
