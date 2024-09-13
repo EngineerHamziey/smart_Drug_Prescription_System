@@ -1,10 +1,13 @@
+#include <WiFi.h>
+#include <WebServer.h>
+#include <WebSocketsServer.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <PulseSensorPlayground.h>
 
-// Data wire is plugged into pin 5 on the ESP32
+// temperature sensor is plugged into pin 5 on the ESP32
 #define ONE_WIRE_BUS 5
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -15,18 +18,37 @@ DallasTemperature sensors(&oneWire);
 // Create an instance of the PulseSensorPlayground
 PulseSensorPlayground pulseSensor;
 
-// Create an instance of the LCD
+const char* ssid = "project";         // Your WiFi SSID
+const char* password = "123456789";   // Your WiFi Password
+
+WebSocketsServer webSocket = WebSocketsServer(81);  // WebSocket server on port 81
+
+// Create an instance of the LCD (20x4 display)
 LiquidCrystal_I2C lcd(0x27, 20, 4);
+
 
 float temperature = 0.0;
 int heartRate = 0;
+String ipAddress = "";
 
-// Function to generate a random heart rate value
-int generateRandomHeartRate() {
-  uint32_t seedValue = esp_random() + millis();
-  randomSeed(seedValue);
-  return random(60, 73); // Generate a random value between 60 and 72
+void handleWebSocketMessage(uint8_t * payload, size_t length) {
+  // No need to handle incoming messages for this application
 }
+
+void onEvent(uint8_t client_num, WStype_t type, uint8_t * payload, size_t length) {
+  switch (type) {
+    case WStype_CONNECTED:
+      Serial.printf("Client %u connected\n", client_num);
+      break;
+    case WStype_DISCONNECTED:
+      Serial.printf("Client %u disconnected\n", client_num);
+      break;
+    case WStype_TEXT:
+      handleWebSocketMessage(payload, length);
+      break;
+  }
+}
+
 
 // Function to detect touch
 bool touchDetected() {
@@ -38,41 +60,77 @@ bool touchDetected() {
   return sensorValue <= 3;
 }
 
-// Function to display text with a typing effect
-void displayTypingEffect(String text, int row) {
-  lcd.setCursor(0, row);
-  for (int i = 0; i < text.length(); i++) {
-    lcd.print(text[i]);
-    delay(50); // Adjust typing speed
-  }
-}
-
-void setup() {
-  // Start the serial communication
+void setup() {// Start the serial communication
   Serial.begin(115200);
 
+  // Initialize the LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Connecting to WiFi...");
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println("Connecting to WiFi...");
+    lcd.clear();
+    delay(500);
+    lcd.print("WiFi connecting....");
+  }
+  Serial.println("Connected to WiFi");
+  lcd.clear();
+  lcd.print("Connected to WiFi");
+  delay(1000);
+
+  // Get the IP address
+  ipAddress = WiFi.localIP().toString();
+  Serial.println("IP Address: " + ipAddress);
+
+  // Display the IP address on the LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("IP:");
+  lcd.setCursor(3, 0);
+  lcd.print(ipAddress);
+
+  // Start WebSocket server
+  webSocket.begin();
+  webSocket.onEvent(onEvent);
   // Initialize the DS18B20 sensor
   sensors.begin();
 
   // Initialize the PulseSensor
   pulseSensor.analogInput(HEART_RATE_PIN);
   pulseSensor.begin();
+}
 
-  // Initialize the LCD
-  lcd.init();
-  lcd.backlight();
-
-  // Display the project title with a typing effect
-  displayTypingEffect("    SMART DRUG", 0);
-  displayTypingEffect("PRESCRIPTION SYSTEM", 1);
-
-  delay(1000);  // Delay to show the title for 3 seconds
+void updateLcd() {
+  // Update the LCD with temperature and heart rate data
+  lcd.setCursor(0, 2);  // Row 1
+  lcd.print("Temperature: ");
+  lcd.print(temperature);
+  lcd.print("C  ");
+  
+  lcd.setCursor(0, 3);
+  lcd.print("Heart Rate: ");
+  lcd.print(heartRate);
+  lcd.print(" BPM");
 }
 
 void loop() {
-  // Check if touch is detected
+  webSocket.loop();
+
+
+  // Read temperature from DS18B20
+  sensors.requestTemperatures();
+  temperature = sensors.getTempCByIndex(0);
+  if (temperature < 0) {
+    temperature = 0;
+  }
+
   if (touchDetected()) {
-    int targetHeartRate = generateRandomHeartRate();
+    int targetHeartRate = random(60, 73);
 
     // Simulate loading the heart rate value
     for (int i = 0; i <= targetHeartRate; i++) {
@@ -87,39 +145,30 @@ void loop() {
     Serial.print("Heart Rate: ");
     Serial.println(targetHeartRate);
 
+    // Send the heart rate and temperature data via WebSocket
+    String data = String("{\"heartRate\":") + targetHeartRate + ",\"temperature\":" + temperature + "}";
+    webSocket.broadcastTXT(data);
+    Serial.println("Sent: " + data);
+    delay(2000); // Send new random numbers every 5 seconds
+
+    heartRate = targetHeartRate;
+    updateLcd();
+
     // Stop further execution
     while (true) {
-      delay(1000); // Infinite loop to stop further execution
+      webSocket.loop();
+      webSocket.broadcastTXT(data);
+      
+      delay(2000); // Infinite loop to stop further execution
     }
-  } else {
-    // Read temperature from DS18B20
-    sensors.requestTemperatures();
-    temperature = sensors.getTempCByIndex(0);
-    temperature = (temperature < 0) ? 0 : temperature;
-
-    // Update the PulseSensor
-    int pulse = pulseSensor.getBeatsPerMinute();
-  
-    // Check if pulse value is valid
-    if (pulse > 0) {
-      heartRate = 0;
-    } else {
-      heartRate = 0; // Handle the case where no pulse is detected
-    }
-
-    // Display the temperature on the LCD
-    lcd.setCursor(0, 2);
-    lcd.print("Temperature: ");
-    lcd.print(temperature);
-    lcd.print("C");
-
-    // Display the heart rate on the LCD
-    lcd.setCursor(0, 3);
-    lcd.print("Heart Rate: ");
-    lcd.print(heartRate);
-    lcd.print(" BPM");
-
-    // Add a delay for stability
-    delay(1000);
   }
+  updateLcd();
+
+  
+
+  // Send the heart rate and temperature data via WebSocket
+  String data = String("{\"heartRate\":") + heartRate + ",\"temperature\":" + temperature + "}";
+  webSocket.broadcastTXT(data);
+  Serial.println("Sent: " + data);
+  delay(2000); // Send new random numbers every 5 seconds
 }
