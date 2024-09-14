@@ -159,12 +159,12 @@
 
     <form id="healthForm">
       <div>
-        <label for="age">What is your age? </label>
-        <input type="number" id="age" name="age" required>
+        <label for="esp32IpAddress">Enter ESP32 IP Address:</label>
+        <input type="text" id="esp32IpAddress" name="esp32IpAddress" placeholder="192.168.1.x" required>
       </div>
       <div>
-        <label for="esp32Ip">Enter ESP32 IP Address:</label>
-        <input type="text" id="esp32Ip" name="esp32Ip" placeholder="192.168.1.x" required>
+        <label for="age">What is your age? </label>
+        <input type="number" id="age" name="age" required>
       </div>
       <!-- Other questions will be added dynamically here -->
     </form>
@@ -173,22 +173,6 @@
   </div>
 
   <script>
-    let ws;
-
-    function connectWebSocket() {
-      const ip = document.getElementById('esp32Ip').value;
-      if (ws) {
-        ws.close();
-      }
-      ws = new WebSocket(`ws://${ip}:81/`);
-
-      ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        document.getElementById('heartRate').textContent = data.heartRate;
-        document.getElementById('temperature').textContent = data.temperature.toFixed(1);
-      };
-    }
-
     const questions = [
       "Are you unable to sleep?",
       "Are you currently taking any medications prescribed by your doctor?",
@@ -242,14 +226,6 @@
     }
 
     function submitForm() {
-      const esp32Ip = document.getElementById('esp32Ip').value;
-      if (!esp32Ip) {
-        alert('Please enter the ESP32 IP address.');
-        return;
-      }
-      
-      connectWebSocket();
-
       const formData = getFormData();
       const prescription = generatePrescription(formData);
       document.getElementById('prescriptionResult').innerHTML = `<strong>Prescription:</strong><br>${prescription.replace(/\n/g, '<br>')}`;

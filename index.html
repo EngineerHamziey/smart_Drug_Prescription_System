@@ -4,54 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ESP32 Random Numbers</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>Random Numbers from ESP32</h1>
-  <label for="ipAddress">ESP32 IP Address: </label>
-  <input type="text" id="ipAddress" placeholder="e.g. 192.168.1.100">
-  <button id="connectBtn">Connect</button>
+  <div class="container">
+    <h1 class="heading">Smart Drug Prescription System</h1>
 
-  <p id="status">Status: Not connected</p>
-  <p><span id="temperature">Temperature: 0</span>&deg;C</p>
-  <p><span id="heart-rate">Heart Rate: 0</span> BPM</p>
-  <p class="user-feedback" id="user-feedback"></p>
+    <label for="esp32IpAddress">ESP32 IP Address: </label>
+    <input type="text" id="esp32IpAddress" placeholder="e.g. 192.168.1.100">
+    <p class="user-feedback" id="user-feedback"></p>
+    <button class="connect-btn" id="connectBtn">Connect</button>
 
-  <script>
-    let ws;
-    const connectBtn = document.getElementById('connectBtn');
-    
-    connectBtn.onclick = connectToSocket; 
-    
-    function connectToSocket() {
-      const ipAddress = document.getElementById('ipAddress').value;
-      const wsUrl = `ws://${ipAddress}:81/`; // Connect to WebSocket server at ESP32 IP and port 81
+    <div class="live-data">
+      <p id="status" class="not-connected">Status: Not connected</p>
+      <p><span id="temperature">Temperature: 0</span>&deg;C</p>
+      <p><span id="heart-rate">Heart Rate: 0</span> BPM</p>
+    </div>
 
-      ws = new WebSocket(wsUrl); //
-
-      ws.onopen = function() {//once connection is established
-        document.getElementById('status').textContent = 'Status: Connected';
-        console.log('Connected to WebSocket server');
-      };
-
-      ws.onmessage = function(event) { //once a new message is received
-        const data = JSON.parse(event.data);// the string into object
-        console.log(data);
-        document.getElementById('temperature').textContent = 'Temperature ' + data.temperature;
-        document.getElementById('heart-rate').textContent = 'Heart Rate: ' + data.heartRate;
-      };
-
-      ws.onclose = function() { //once the connection is closed
-        document.getElementById('status').textContent = 'Status: Disconnected';
-        console.log('Disconnected from WebSocket server');
-      };
-
-      ws.onerror = function() { //once error is encountered in connection
-        document.getElementById('status').textContent = 'Status: Connection Error';
-        console.log('Error connecting to WebSocket server');
-      };
-    };
-
-
-  </script>
+    <form id="healthForm">
+      <div>
+        <label for="age">What is your age? </label>
+        <input type="number" id="age" name="age" required>
+      </div>
+      <!-- Other questions will be added dynamically here -->
+    </form>
+    <div id="prescriptionResult"></div>
+    <button class="submit-btn" onclick="submitForm()">Get Prescription</button>
+  </div>
 </body>
 </html>
