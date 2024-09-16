@@ -21,7 +21,8 @@ function connectToSocket() {
     return;
   }
   alertUserLoading(add);
-  const wsUrl = `ws://${esp32IpAddress}:81/`; // Connect to WebSocket server at ESP32 IP and port 81
+  // using wss:// is safer as it can work for both http and https unlike ws that can only work for http
+  const wsUrl = `wss://${esp32IpAddress}:81/`; // Connect to WebSocket server at ESP32 IP and port 81
 
   ws = new WebSocket(wsUrl); //
 
