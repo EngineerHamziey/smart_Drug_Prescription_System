@@ -1,3 +1,5 @@
+#if 0
+
 #include <WiFi.h>
 #include <WebServer.h>
 #include <WebSocketsServer.h>
@@ -18,8 +20,8 @@ DallasTemperature sensors(&oneWire);
 // Create an instance of the PulseSensorPlayground
 PulseSensorPlayground pulseSensor;
 
-const char* ssid = "project";         // Your WiFi SSID
-const char* password = "123456789";   // Your WiFi Password
+const char* ssid = "love";         // Your WiFi SSID
+const char* password = "olamidesamsig";   // Your WiFi Password
 
 WebSocketsServer webSocket = WebSocketsServer(81);  // WebSocket server on port 81
 
@@ -172,3 +174,5 @@ void loop() {
   Serial.println("Sent: " + data);
   delay(300); // Send new random numbers every 5 seconds
 }
+
+#endif
